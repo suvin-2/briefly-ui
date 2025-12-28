@@ -12,10 +12,30 @@ interface DateItem {
   isToday: boolean
 }
 
-export function WeeklyDateStrip() {
-  const [startDate, setStartDate] = useState(new Date())
+interface WeeklyDateStripProps {
+  selectedDate: Date
+  onSelectDate: (date: Date) => void
+}
+
+export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripProps) {
+  // selectedDate를 기준으로 주의 시작 날짜 계산
+  const getWeekStart = (date: Date) => {
+    const d = new Date(date)
+    d.setHours(0, 0, 0, 0)
+    const day = d.getDay()
+    const diff = day === 0 ? -6 : 1 - day // 월요일 시작
+    d.setDate(d.getDate() + diff)
+    return d
+  }
+
+  const [startDate, setStartDate] = useState(() => getWeekStart(selectedDate))
   const [rangeStart, setRangeStart] = useState<number | null>(null)
   const [rangeEnd, setRangeEnd] = useState<number | null>(null)
+
+  // selectedDate가 변경되면 해당 날짜가 포함된 주로 이동
+  useEffect(() => {
+    setStartDate(getWeekStart(selectedDate))
+  }, [selectedDate])
 
   // Generate dates for the strip (7 days on mobile, 14 on desktop)
   const generateDates = (count: number): DateItem[] => {
@@ -38,10 +58,18 @@ export function WeeklyDateStrip() {
     return dates
   }
 
-  const [selectedDate, setSelectedDate] = useState<number>(generateDates(14).findIndex((d) => d.isToday))
-
   const mobileDates = generateDates(7)
   const desktopDates = generateDates(14)
+
+  // 현재 선택된 날짜의 인덱스 계산
+  const getSelectedIndex = (dates: DateItem[]) => {
+    return dates.findIndex(
+      (item) => item.date.toISOString().split("T")[0] === selectedDate.toISOString().split("T")[0],
+    )
+  }
+
+  const selectedMobileIndex = getSelectedIndex(mobileDates)
+  const selectedDesktopIndex = getSelectedIndex(desktopDates)
 
   const handlePrev = () => {
     const newDate = new Date(startDate)
@@ -124,10 +152,12 @@ export function WeeklyDateStrip() {
               {mobileDates.map((item, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setSelectedDate(idx)}
+                  onClick={() => onSelectDate(item.date)}
                   className={cn(
                     "flex h-14 w-14 shrink-0 snap-center flex-col items-center justify-center rounded-lg transition-all",
-                    selectedDate === idx ? "bg-[#5D7AA5] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                    selectedMobileIndex === idx
+                      ? "bg-[#5D7AA5] text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200",
                     item.isToday && "ring-2 ring-[#5D7AA5] ring-offset-2",
                   )}
                 >
@@ -147,10 +177,12 @@ export function WeeklyDateStrip() {
             {desktopDates.map((item, idx) => (
               <button
                 key={idx}
-                onClick={() => setSelectedDate(idx)}
+                onClick={() => onSelectDate(item.date)}
                 className={cn(
                   "flex flex-col items-center rounded-lg px-3 py-2 transition-all",
-                  selectedDate === idx ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200",
+                  selectedDesktopIndex === idx
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-500 hover:bg-gray-200",
                   item.isToday && "ring-2 ring-gray-900 ring-offset-2",
                 )}
               >
