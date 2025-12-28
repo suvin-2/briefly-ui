@@ -7,25 +7,12 @@ import { TodoItem } from "@/components/todo-item"
 import { TodoInput } from "@/components/todo-input"
 import { TodoDetailModal } from "@/components/todo-detail-modal"
 import { useLanguage } from "@/lib/language-context"
-
-interface Todo {
-  id: string
-  text: string
-  completed: boolean
-  targetDate?: Date
-  memo?: string
-}
+import type { Todo } from "@/types"
+import { MOCK_TODOS } from "@/data/mock-todos"
 
 export default function HomePage() {
   const { t } = useLanguage()
-  const [todos, setTodos] = useState<Todo[]>([
-    { id: "1", text: "Review weekly design system updates", completed: false },
-    { id: "2", text: "Implement glassmorphism navigation component", completed: true },
-    { id: "3", text: "Test responsive layout on mobile devices", completed: false },
-    { id: "4", text: "Update documentation for new UI patterns", completed: false },
-    { id: "5", text: "Schedule team meeting for project review", completed: false },
-    { id: "6", text: "Optimize image assets for better performance", completed: false },
-  ])
+  const [todos, setTodos] = useState<Todo[]>(MOCK_TODOS)
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -68,7 +55,7 @@ export default function HomePage() {
         {/* Header */}
         <div className="mb-6 space-y-2">
           <h1 className="text-balance text-3xl font-bold text-gray-900">{t.weeklyTodos}</h1>
-          <p className="text-pretty text-gray-600">Manage your tasks with a clean, minimal interface</p>
+          <p className="text-pretty text-gray-600">{t.todoSubtitle}</p>
         </div>
 
         {/* Weekly Date Strip */}

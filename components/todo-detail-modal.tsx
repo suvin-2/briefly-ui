@@ -11,17 +11,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import type { Todo } from "@/types"
 
 interface TodoDetailModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  todo: {
-    id: string
-    text: string
-    completed: boolean
-    targetDate?: Date
-    memo?: string
-  } | null
+  todo: Todo | null
   onSave: (id: string, updates: { text: string; targetDate?: Date; memo?: string }) => void
   onDelete: (id: string) => void
 }

@@ -12,6 +12,7 @@ export const translations = {
 
     // Home/Todo
     weeklyTodos: "주간 할 일",
+    todoSubtitle: "깔끔하고 미니멀한 인터페이스로 작업을 관리하세요",
     addTodo: "할 일 추가...",
     addButton: "추가",
     memo: "메모",
@@ -83,6 +84,7 @@ export const translations = {
 
     // Home/Todo
     weeklyTodos: "Weekly Todos",
+    todoSubtitle: "Manage your tasks with a clean, minimal interface",
     addTodo: "Add a todo...",
     addButton: "Add",
     memo: "Memo",
