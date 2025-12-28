@@ -26,6 +26,7 @@ export const translations = {
     template: "템플릿",
     created: "생성일",
     download: "다운로드",
+    downloadText: "텍스트 다운로드 (.md)",
     share: "공유",
     selectDateRange: "날짜 범위 선택",
     selectTemplate: "템플릿 선택",
@@ -33,6 +34,7 @@ export const translations = {
     weeklyReport: "주간 리포트",
     monthlyReport: "월간 리포트",
     cancel: "취소",
+    basicTemplate: "기본 양식 (Markdown)",
 
     // Templates
     templatesLibrary: "템플릿 라이브러리",
@@ -98,6 +100,7 @@ export const translations = {
     template: "Template",
     created: "Created",
     download: "Download",
+    downloadText: "Download Text (.md)",
     share: "Share",
     selectDateRange: "Select Date Range",
     selectTemplate: "Select Template",
@@ -105,6 +108,7 @@ export const translations = {
     weeklyReport: "Weekly Report",
     monthlyReport: "Monthly Report",
     cancel: "Cancel",
+    basicTemplate: "Basic Template (Markdown)",
 
     // Templates
     templatesLibrary: "Templates Library",
