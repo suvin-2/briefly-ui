@@ -2,6 +2,22 @@ import { supabase } from "@/lib/supabase"
 import type { Todo } from "@/types"
 
 // ========================================
+// Timezone Helper (Local Date First)
+// ========================================
+/**
+ * Date 객체를 로컬 시간 기준 'YYYY-MM-DD' 문자열로 변환
+ * 타임존 버그 방지: toISOString()은 UTC로 변환하므로 절대 사용 금지
+ * @param date - 변환할 Date 객체
+ * @returns 로컬 시간 기준 'YYYY-MM-DD' 문자열
+ */
+export function formatLocalDate(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
+
+// ========================================
 // Database 타입 (Supabase 스키마와 일치)
 // ========================================
 interface DatabaseTodo {
@@ -33,7 +49,7 @@ function toDatabase(todo: Partial<Todo>): Partial<Omit<DatabaseTodo, "id" | "use
   if (todo.text !== undefined) dbTodo.content = todo.text
   if (todo.completed !== undefined) dbTodo.completed = todo.completed
   if (todo.targetDate !== undefined) {
-    dbTodo.target_date = todo.targetDate.toISOString().split("T")[0] // YYYY-MM-DD
+    dbTodo.target_date = formatLocalDate(todo.targetDate)
   }
   if (todo.memo !== undefined) dbTodo.memo = todo.memo || null
 
@@ -65,7 +81,7 @@ export async function getAllTodos(): Promise<Todo[]> {
  * 특정 날짜의 Todo 조회
  */
 export async function getTodosByDate(date: Date): Promise<Todo[]> {
-  const dateString = date.toISOString().split("T")[0] // YYYY-MM-DD
+  const dateString = formatLocalDate(date)
 
   const { data, error } = await supabase
     .from("todos")
@@ -85,8 +101,8 @@ export async function getTodosByDate(date: Date): Promise<Todo[]> {
  * 날짜 범위로 Todo 조회 (리포트 생성용)
  */
 export async function getTodosByDateRange(startDate: Date, endDate: Date): Promise<Todo[]> {
-  const startString = startDate.toISOString().split("T")[0]
-  const endString = endDate.toISOString().split("T")[0]
+  const startString = formatLocalDate(startDate)
+  const endString = formatLocalDate(endDate)
 
   const { data, error } = await supabase
     .from("todos")

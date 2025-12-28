@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { AppShell } from "@/components/app-shell"
 import { ReportCard } from "@/components/report-card"
 import { GenerateReportDialog } from "@/components/generate-report-dialog"
@@ -8,97 +8,56 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
 import { useLanguage } from "@/lib/language-context"
-
-// Mock data
-const reports = [
-  {
-    id: "1",
-    title: "Weekly Report #12",
-    dateRange: "Dec 1-7, 2024",
-    createdAt: "Dec 8, 2024",
-    template: "Weekly Summary",
-    templateDeleted: false,
-    reportContent: `# 주간 업무 리포트
-
-**기간**: 2024.12.01 ~ 2024.12.07
-**작성일**: 2024.12.08
-
----
-
-## 📋 이번 주 요약
-- 총 작업: 8건
-- 완료: 6건 (75%)
-- 진행 중: 2건
-
----
-
-## ✅ 완료한 작업
-
-### 1. 디자인 시스템 업데이트 검토
-> 새로운 컬러 팔레트와 타이포그래피 가이드 검토 완료
-
-### 2. Glassmorphism 네비게이션 컴포넌트 구현
-> React 기반으로 재사용 가능한 컴포넌트 개발 완료`,
-  },
-  {
-    id: "2",
-    title: "Monthly Overview - November",
-    dateRange: "Nov 1-30, 2024",
-    createdAt: "Dec 1, 2024",
-    template: "Monthly Overview",
-    templateDeleted: false,
-    reportContent: `# 월간 업무 리포트
-
-**기간**: 2024.11.01 ~ 2024.11.30
-**작성일**: 2024.12.01`,
-  },
-  {
-    id: "3",
-    title: "Project Alpha Update with a Very Long Title That Should Be Truncated to Two Lines Maximum",
-    dateRange: "Nov 15-30, 2024",
-    createdAt: "Nov 30, 2024",
-    template: "Project Update with Very Long Template Name That Should Also Be Truncated",
-    templateDeleted: false,
-    reportContent: `# Project Alpha 업데이트
-
-**기간**: 2024.11.15 ~ 2024.11.30`,
-  },
-  {
-    id: "4",
-    title: "Team Performance Q4",
-    dateRange: "Oct 1 - Dec 14, 2024",
-    createdAt: "Dec 14, 2024",
-    template: "Team Performance",
-    templateDeleted: true,
-    reportContent: `# 팀 성과 리포트 (Q4)
-
-**기간**: 2024.10.01 ~ 2024.12.14
-**작성일**: 2024.12.14
-
----
-
-## 📋 Q4 요약
-- 총 프로젝트: 5개
-- 완료: 4개 (80%)
-- 진행 중: 1개`,
-  },
-  {
-    id: "5",
-    title: "Weekly Report #11",
-    dateRange: "Nov 24-30, 2024",
-    createdAt: "Dec 1, 2024",
-    template: "Weekly Summary",
-    templateDeleted: false,
-    reportContent: `# 주간 업무 리포트
-
-**기간**: 2024.11.24 ~ 2024.11.30`,
-  },
-]
+import type { Report } from "@/types"
+import * as reportService from "@/services/report.service"
+import { toast } from "sonner"
 
 export default function ReportPage() {
   const { t } = useLanguage()
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [reports, setReports] = useState<Report[]>([])
+  const [loading, setLoading] = useState(true)
   const isMobile = useMobile()
+
+  // 리포트 목록 조회
+  useEffect(() => {
+    loadReports()
+  }, [])
+
+  const loadReports = async () => {
+    try {
+      setLoading(true)
+      const data = await reportService.getReports()
+      setReports(data)
+    } catch (error) {
+      console.error("Failed to load reports:", error)
+      toast.error("리포트를 불러오는데 실패했습니다")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleReportCreated = (newReport: Report) => {
+    setReports((prev) => [newReport, ...prev])
+    setDialogOpen(false)
+    toast.success("리포트가 생성되었습니다")
+  }
+
+  const handleDelete = async (id: string) => {
+    // Optimistic UI
+    const previousReports = [...reports]
+    setReports((prev) => prev.filter((report) => report.id !== id))
+
+    try {
+      await reportService.deleteReport(id)
+      toast.success("리포트가 삭제되었습니다")
+    } catch (error) {
+      console.error("Failed to delete report:", error)
+      toast.error("리포트 삭제에 실패했습니다")
+      // 롤백
+      setReports(previousReports)
+    }
+  }
 
   return (
     <AppShell>
@@ -122,11 +81,25 @@ export default function ReportPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {reports.map((report) => (
-            <ReportCard key={report.id} {...report} />
-          ))}
-        </div>
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-gray-500">Loading...</div>
+          </div>
+        ) : reports.length === 0 ? (
+          /* Empty State */
+          <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+            <p className="text-lg font-medium">생성된 리포트가 없습니다</p>
+            <p className="mt-2 text-sm">새 리포트를 만들어보세요!</p>
+          </div>
+        ) : (
+          /* Report List */
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {reports.map((report) => (
+              <ReportCard key={report.id} report={report} onDelete={handleDelete} />
+            ))}
+          </div>
+        )}
 
         {/* Mobile: FAB */}
         {isMobile && (
@@ -139,7 +112,7 @@ export default function ReportPage() {
         )}
 
         {/* Generate Report Dialog */}
-        <GenerateReportDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+        <GenerateReportDialog open={dialogOpen} onOpenChange={setDialogOpen} onReportCreated={handleReportCreated} />
       </div>
     </AppShell>
   )

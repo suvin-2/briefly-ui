@@ -1,4 +1,5 @@
 "use client"
+
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { FileText } from "lucide-react"
@@ -14,13 +15,13 @@ interface TodoItemProps {
 
 export function TodoItem({ id, text, completed, onToggle, onMemo }: TodoItemProps) {
   return (
-    <div className="group border-white/50 bg-white/70 backdrop-blur-md rounded-xl border p-4 transition-all hover:bg-white/80">
+    <div className="group rounded-xl border border-white/50 bg-white/70 p-4 backdrop-blur-md transition-all hover:bg-white/80">
       <div className="flex items-start gap-3">
         <Checkbox
           id={id}
           checked={completed}
           onCheckedChange={() => onToggle(id)}
-          className="mt-1 border-gray-300 data-[state=checked]:bg-gray-900 data-[state=checked]:border-gray-900"
+          className="mt-1 border-gray-300 data-[state=checked]:border-gray-900 data-[state=checked]:bg-gray-900"
         />
         <label
           htmlFor={id}

@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run build:*)",
+      "Bash(git commit:*)",
+      "Bash(git add:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(timeout 15 bash:*)",
+      "Bash(timeout 30 bash:*)",
+      "Bash(rm:*)",
+      "Bash(npx next dev:*)"
+    ]
+  }
+}

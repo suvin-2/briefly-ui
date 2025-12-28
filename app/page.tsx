@@ -1,59 +1,22 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { WeeklyDateStrip } from "@/components/weekly-date-strip"
 import { TodoItem } from "@/components/todo-item"
 import { TodoInput } from "@/components/todo-input"
 import { TodoDetailModal } from "@/components/todo-detail-modal"
 import { useLanguage } from "@/lib/language-context"
+import { useTodos } from "@/hooks/use-todos"
 import type { Todo } from "@/types"
-import * as todoService from "@/services/todo.service"
 
 export default function HomePage() {
   const { t } = useLanguage()
-  const [todos, setTodos] = useState<Todo[]>([])
+  const { todos, loading, selectedDate, setSelectedDate, handleAdd, handleToggle, handleUpdate, handleDelete } =
+    useTodos()
+
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
-
-  // 선택된 날짜 상태 (기본값: 오늘)
-  const [selectedDate, setSelectedDate] = useState<Date>(() => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    return today
-  })
-
-  // selectedDate가 변경될 때마다 해당 날짜의 todos 조회
-  useEffect(() => {
-    loadTodosByDate(selectedDate)
-  }, [selectedDate])
-
-  const loadTodosByDate = async (date: Date) => {
-    try {
-      setLoading(true)
-      const data = await todoService.getTodosByDate(date)
-      setTodos(data)
-    } catch (error) {
-      console.error("Failed to load todos:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleToggle = async (id: string) => {
-    try {
-      // Optimistic UI 업데이트
-      setTodos((prev) => prev.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed } : todo)))
-
-      // 서버 업데이트
-      await todoService.toggleTodo(id)
-    } catch (error) {
-      console.error("Failed to toggle todo:", error)
-      // 실패 시 데이터 다시 로드
-      loadTodosByDate(selectedDate)
-    }
-  }
 
   const handleMemo = (id: string) => {
     const todo = todos.find((t) => t.id === id)
@@ -63,50 +26,21 @@ export default function HomePage() {
     }
   }
 
-  const handleAdd = async (text: string) => {
-    try {
-      const newTodo = await todoService.createTodo({
-        text,
-        completed: false,
-        targetDate: selectedDate, // 선택된 날짜로 설정
-      })
-      setTodos((prev) => [newTodo, ...prev])
-    } catch (error) {
-      console.error("Failed to create todo:", error)
-    }
-  }
-
   const handleSave = async (id: string, updates: { text: string; targetDate?: Date; memo?: string }) => {
     try {
-      // Optimistic UI 업데이트
-      setTodos((prev) =>
-        prev.map((todo) =>
-          todo.id === id ? { ...todo, text: updates.text, targetDate: updates.targetDate, memo: updates.memo } : todo,
-        ),
-      )
-
-      // 서버 업데이트
-      await todoService.updateTodo(id, updates)
+      await handleUpdate(id, updates)
       setModalOpen(false)
-    } catch (error) {
-      console.error("Failed to update todo:", error)
-      // 실패 시 데이터 다시 로드
-      loadTodosByDate(selectedDate)
+    } catch {
+      // Error handled by hook
     }
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDeleteWithModal = async (id: string) => {
     try {
-      // Optimistic UI 업데이트
-      setTodos((prev) => prev.filter((todo) => todo.id !== id))
-
-      // 서버 삭제
-      await todoService.deleteTodo(id)
+      await handleDelete(id)
       setModalOpen(false)
-    } catch (error) {
-      console.error("Failed to delete todo:", error)
-      // 실패 시 데이터 다시 로드
-      loadTodosByDate(selectedDate)
+    } catch {
+      // Error handled by hook
     }
   }
 
@@ -163,7 +97,7 @@ export default function HomePage() {
         onOpenChange={setModalOpen}
         todo={selectedTodo}
         onSave={handleSave}
-        onDelete={handleDelete}
+        onDelete={handleDeleteWithModal}
       />
     </AppShell>
   )

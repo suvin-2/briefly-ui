@@ -28,14 +28,15 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
     return d
   }
 
-  const [startDate, setStartDate] = useState(() => getWeekStart(selectedDate))
+  // 현재 보고 있는 주간 (독립적인 상태)
+  const [currentWeekStart, setCurrentWeekStart] = useState(() => getWeekStart(selectedDate))
   const [rangeStart, setRangeStart] = useState<number | null>(null)
   const [rangeEnd, setRangeEnd] = useState<number | null>(null)
 
-  // selectedDate가 변경되면 해당 날짜가 포함된 주로 이동
+  // 초기 진입 시에만 selectedDate가 포함된 주로 이동
   useEffect(() => {
-    setStartDate(getWeekStart(selectedDate))
-  }, [selectedDate])
+    setCurrentWeekStart(getWeekStart(selectedDate))
+  }, []) // 빈 배열로 초기 마운트 시에만 실행
 
   // Generate dates for the strip (7 days on mobile, 14 on desktop)
   const generateDates = (count: number): DateItem[] => {
@@ -44,8 +45,8 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
     today.setHours(0, 0, 0, 0)
 
     for (let i = 0; i < count; i++) {
-      const date = new Date(startDate)
-      date.setDate(startDate.getDate() + i)
+      const date = new Date(currentWeekStart)
+      date.setDate(currentWeekStart.getDate() + i)
       const isToday = date.getTime() === today.getTime()
 
       dates.push({
@@ -72,15 +73,15 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
   const selectedDesktopIndex = getSelectedIndex(desktopDates)
 
   const handlePrev = () => {
-    const newDate = new Date(startDate)
-    newDate.setDate(startDate.getDate() - 7)
-    setStartDate(newDate)
+    const newDate = new Date(currentWeekStart)
+    newDate.setDate(currentWeekStart.getDate() - 7)
+    setCurrentWeekStart(newDate)
   }
 
   const handleNext = () => {
-    const newDate = new Date(startDate)
-    newDate.setDate(startDate.getDate() + 7)
-    setStartDate(newDate)
+    const newDate = new Date(currentWeekStart)
+    newDate.setDate(currentWeekStart.getDate() + 7)
+    setCurrentWeekStart(newDate)
   }
 
   const getDateRangeClass = (idx: number) => {
@@ -124,12 +125,29 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
     checkScroll()
   }, [mobileDates])
 
-  const currentMonth = startDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+  // 현재 보고 있는 주간의 연월 정보
+  const getWeekRangeDisplay = () => {
+    const weekEnd = new Date(currentWeekStart)
+    weekEnd.setDate(currentWeekStart.getDate() + 6)
+
+    const startMonth = currentWeekStart.toLocaleDateString("en-US", { month: "long" })
+    const endMonth = weekEnd.toLocaleDateString("en-US", { month: "long" })
+    const year = currentWeekStart.getFullYear()
+
+    // 같은 달인 경우
+    if (startMonth === endMonth) {
+      return `${startMonth} ${year}`
+    }
+    // 다른 달에 걸쳐 있는 경우
+    return `${startMonth} - ${endMonth} ${year}`
+  }
+
+  const weekRangeDisplay = getWeekRangeDisplay()
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">{currentMonth}</h2>
+        <h2 className="text-xl font-bold text-gray-900">{weekRangeDisplay}</h2>
       </div>
 
       <div className="max-w-full rounded-xl border border-white/50 bg-white/70 backdrop-blur-md">
