@@ -17,15 +17,22 @@ export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  // 초기 데이터 로드
-  useEffect(() => {
-    loadTodos()
-  }, [])
+  // 선택된 날짜 상태 (기본값: 오늘)
+  const [selectedDate, setSelectedDate] = useState<Date>(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return today
+  })
 
-  const loadTodos = async () => {
+  // selectedDate가 변경될 때마다 해당 날짜의 todos 조회
+  useEffect(() => {
+    loadTodosByDate(selectedDate)
+  }, [selectedDate])
+
+  const loadTodosByDate = async (date: Date) => {
     try {
       setLoading(true)
-      const data = await todoService.getAllTodos()
+      const data = await todoService.getTodosByDate(date)
       setTodos(data)
     } catch (error) {
       console.error("Failed to load todos:", error)
@@ -44,7 +51,7 @@ export default function HomePage() {
     } catch (error) {
       console.error("Failed to toggle todo:", error)
       // 실패 시 데이터 다시 로드
-      loadTodos()
+      loadTodosByDate(selectedDate)
     }
   }
 
@@ -61,7 +68,7 @@ export default function HomePage() {
       const newTodo = await todoService.createTodo({
         text,
         completed: false,
-        targetDate: new Date(), // 오늘 날짜로 설정
+        targetDate: selectedDate, // 선택된 날짜로 설정
       })
       setTodos((prev) => [newTodo, ...prev])
     } catch (error) {
@@ -84,7 +91,7 @@ export default function HomePage() {
     } catch (error) {
       console.error("Failed to update todo:", error)
       // 실패 시 데이터 다시 로드
-      loadTodos()
+      loadTodosByDate(selectedDate)
     }
   }
 
@@ -99,7 +106,7 @@ export default function HomePage() {
     } catch (error) {
       console.error("Failed to delete todo:", error)
       // 실패 시 데이터 다시 로드
-      loadTodos()
+      loadTodosByDate(selectedDate)
     }
   }
 
@@ -113,7 +120,7 @@ export default function HomePage() {
         </div>
 
         {/* Weekly Date Strip */}
-        <WeeklyDateStrip />
+        <WeeklyDateStrip selectedDate={selectedDate} onSelectDate={setSelectedDate} />
 
         {/* Desktop: Input at Top (Notion style) */}
         <div className="hidden md:block">
