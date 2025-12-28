@@ -33,7 +33,7 @@
     - 데스크탑, 태블릿, 모바일 등 모든 디바이스에 최적화된 반응형 레이아웃
     - 세련된 글래스모피즘(Glassmorphism) 디자인 시스템 적용
 4.  **Developer Experience (DX)**
-    - 재사용 가능한 컴포넌트 설계 (`src/components/ui`)
+    - 재사용 가능한 컴포넌트 설계 (`components/ui`)
     - 개발 편의를 위한 UI 가이드 및 플레이그라운드 페이지 포함
 
 ## 🚀 Getting Started
