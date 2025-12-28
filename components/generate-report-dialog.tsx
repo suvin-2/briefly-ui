@@ -22,7 +22,7 @@ interface GenerateReportDialogProps {
 export function GenerateReportDialog({ open, onOpenChange }: GenerateReportDialogProps) {
   const isMobile = useMobile()
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
-  const [template, setTemplate] = useState<string>()
+  const [template, setTemplate] = useState<string>("basic")
 
   const handleGenerate = () => {
     // Generate report logic here
@@ -78,6 +78,7 @@ export function GenerateReportDialog({ open, onOpenChange }: GenerateReportDialo
             <SelectValue placeholder="Select a template" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="basic">✨ 기본 양식 (Markdown)</SelectItem>
             <SelectItem value="weekly-summary">Weekly Summary</SelectItem>
             <SelectItem value="monthly-overview">Monthly Overview</SelectItem>
             <SelectItem value="project-update">Project Update</SelectItem>

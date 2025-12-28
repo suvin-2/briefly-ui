@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { FileText, Download, Share2, X } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { cn } from "@/lib/utils"
+import { downloadAsMarkdown } from "@/lib/download-utils"
 
 interface ReportCardProps {
   id: string
@@ -13,10 +14,31 @@ interface ReportCardProps {
   createdAt: string
   template: string
   templateDeleted?: boolean
+  reportContent?: string
 }
 
-export function ReportCard({ title, dateRange, createdAt, template, templateDeleted = false }: ReportCardProps) {
+export function ReportCard({
+  title,
+  dateRange,
+  createdAt,
+  template,
+  templateDeleted = false,
+  reportContent,
+}: ReportCardProps) {
   const { t } = useLanguage()
+
+  const handleDownload = () => {
+    if (templateDeleted || !reportContent) {
+      // Case 1: 기본 양식으로 다운로드
+      const defaultContent = reportContent || "# 리포트 내용이 없습니다."
+      const filename = `${title.replace(/\s+/g, "-").toLowerCase()}.md`
+      downloadAsMarkdown(defaultContent, filename)
+    } else {
+      // Case 2: 커스텀 템플릿으로 다운로드 (향후 구현)
+      const filename = `${title.replace(/\s+/g, "-").toLowerCase()}.md`
+      downloadAsMarkdown(reportContent, filename)
+    }
+  }
 
   return (
     <Card className="group flex h-full flex-col border-gray-200 bg-white shadow-lg transition-all hover:shadow-xl hover:shadow-gray-200/60">
@@ -61,17 +83,12 @@ export function ReportCard({ title, dateRange, createdAt, template, templateDele
           <Button
             variant="outline"
             size="sm"
-            disabled={templateDeleted}
-            className={cn(
-              "flex-1 rounded-xl border-gray-200 font-medium shadow-sm transition-all",
-              templateDeleted
-                ? "cursor-not-allowed bg-gray-100 text-gray-400"
-                : "bg-white text-gray-700 hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white",
-            )}
-            title={templateDeleted ? "Source template deleted" : undefined}
+            onClick={handleDownload}
+            className="flex-1 rounded-xl border-gray-200 bg-white font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white"
+            title={templateDeleted ? "Download as Markdown" : "Download report"}
           >
             <Download className="mr-2 h-4 w-4" />
-            {templateDeleted ? "Text Only" : t.download}
+            {templateDeleted ? "Download Text (.md)" : t.download}
           </Button>
           <Button
             variant="outline"

@@ -56,6 +56,10 @@ export function WeeklyDateStrip() {
   }
 
   const getDateRangeClass = (idx: number) => {
+    if (rangeStart === null || rangeEnd === null) {
+      return "bg-gray-100 text-gray-600 hover:bg-gray-200"
+    }
+
     if (idx === rangeStart && idx === rangeEnd) {
       // Single day selection
       return "bg-[#5D7AA5] text-white rounded-xl"
