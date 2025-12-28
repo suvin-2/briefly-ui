@@ -18,6 +18,27 @@ const reports = [
     createdAt: "Dec 8, 2024",
     template: "Weekly Summary",
     templateDeleted: false,
+    reportContent: `# 주간 업무 리포트
+
+**기간**: 2024.12.01 ~ 2024.12.07
+**작성일**: 2024.12.08
+
+---
+
+## 📋 이번 주 요약
+- 총 작업: 8건
+- 완료: 6건 (75%)
+- 진행 중: 2건
+
+---
+
+## ✅ 완료한 작업
+
+### 1. 디자인 시스템 업데이트 검토
+> 새로운 컬러 팔레트와 타이포그래피 가이드 검토 완료
+
+### 2. Glassmorphism 네비게이션 컴포넌트 구현
+> React 기반으로 재사용 가능한 컴포넌트 개발 완료`,
   },
   {
     id: "2",
@@ -26,6 +47,10 @@ const reports = [
     createdAt: "Dec 1, 2024",
     template: "Monthly Overview",
     templateDeleted: false,
+    reportContent: `# 월간 업무 리포트
+
+**기간**: 2024.11.01 ~ 2024.11.30
+**작성일**: 2024.12.01`,
   },
   {
     id: "3",
@@ -34,6 +59,9 @@ const reports = [
     createdAt: "Nov 30, 2024",
     template: "Project Update with Very Long Template Name That Should Also Be Truncated",
     templateDeleted: false,
+    reportContent: `# Project Alpha 업데이트
+
+**기간**: 2024.11.15 ~ 2024.11.30`,
   },
   {
     id: "4",
@@ -42,6 +70,17 @@ const reports = [
     createdAt: "Dec 14, 2024",
     template: "Team Performance",
     templateDeleted: true,
+    reportContent: `# 팀 성과 리포트 (Q4)
+
+**기간**: 2024.10.01 ~ 2024.12.14
+**작성일**: 2024.12.14
+
+---
+
+## 📋 Q4 요약
+- 총 프로젝트: 5개
+- 완료: 4개 (80%)
+- 진행 중: 1개`,
   },
   {
     id: "5",
@@ -50,6 +89,9 @@ const reports = [
     createdAt: "Dec 1, 2024",
     template: "Weekly Summary",
     templateDeleted: false,
+    reportContent: `# 주간 업무 리포트
+
+**기간**: 2024.11.24 ~ 2024.11.30`,
   },
 ]
 

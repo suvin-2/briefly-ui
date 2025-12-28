@@ -1,22 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { AppShell } from "@/components/app-shell"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useLanguage } from "@/lib/language-context"
+import { useAuth } from "@/components/auth-provider"
 import type { Language } from "@/lib/i18n"
-import LoginPage from "../login/page"
-import { ChevronRight, Globe } from "lucide-react"
+import { ChevronRight, Globe, LogOut, User } from "lucide-react"
+import Image from "next/image"
 
 export default function MyPage() {
   const { t, language, setLanguage } = useLanguage()
-  const [showLogin, setShowLogin] = useState(false)
+  const { user, signOut } = useAuth()
+  const router = useRouter()
 
-  if (showLogin) {
-    return <LoginPage />
+  const handleSignOut = async () => {
+    await signOut()
+    router.push("/login")
   }
 
   return (
@@ -62,30 +65,60 @@ export default function MyPage() {
           </CardContent>
         </Card>
 
-        {/* Login Test Button */}
-        <Card className="border-gray-200 bg-white shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-gray-900">{t.testLogin}</CardTitle>
-            <CardDescription className="text-gray-500">View the login screen design</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onClick={() => setShowLogin(true)}
-              className="w-full rounded-xl bg-[#5D7AA5] text-white hover:bg-[#4d6a95] sm:w-auto"
-            >
-              {t.testLogin}
-            </Button>
-          </CardContent>
-        </Card>
-
         {/* Profile Settings */}
         <Card className="border-gray-200 bg-white shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-gray-900">{t.profileSettings}</CardTitle>
-            <CardDescription className="text-gray-500">{t.updateAccountInfo}</CardDescription>
+          <CardHeader className="border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="rounded-2xl bg-[#5D7AA5] p-3 shadow-md shadow-[#5D7AA5]/20">
+                <User className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-gray-900">{t.profileSettings}</CardTitle>
+                <CardDescription className="text-gray-500">{t.updateAccountInfo}</CardDescription>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-500">Profile content and settings go here...</p>
+          <CardContent className="p-6">
+            {user ? (
+              <div className="space-y-6">
+                {/* User Profile */}
+                <div className="flex items-center gap-4">
+                  {user.user_metadata?.avatar_url ? (
+                    <Image
+                      src={user.user_metadata.avatar_url}
+                      alt="Profile"
+                      width={64}
+                      height={64}
+                      className="rounded-full ring-2 ring-gray-200"
+                    />
+                  ) : (
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#5D7AA5] text-2xl font-bold text-white">
+                      {user.email?.[0].toUpperCase()}
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <p className="text-lg font-semibold text-gray-900">
+                      {user.user_metadata?.full_name || user.email}
+                    </p>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                  </div>
+                </div>
+
+                {/* Logout Button */}
+                <div className="pt-4">
+                  <Button
+                    onClick={handleSignOut}
+                    variant="outline"
+                    className="w-full rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 sm:w-auto"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    로그아웃
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">로그인이 필요합니다.</p>
+            )}
           </CardContent>
         </Card>
       </div>
