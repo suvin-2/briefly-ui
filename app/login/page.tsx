@@ -1,15 +1,47 @@
 "use client"
 
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useLanguage } from "@/lib/language-context"
+import { useAuth } from "@/components/auth-provider"
+import { supabase } from "@/lib/supabase"
 
 export default function LoginPage() {
   const { t } = useLanguage()
+  const { user, loading: authLoading } = useAuth()
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
-  const handleGoogleLogin = () => {
-    console.log("[v0] Google login clicked")
-    // Implement Google OAuth logic here
+  // 미들웨어에서 처리하므로 클라이언트 사이드 리다이렉트 불필요
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true)
+      console.log("🚀 Starting Google login...")
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
+        },
+      })
+
+      if (error) {
+        console.error("❌ Google login error:", error)
+        alert("로그인에 실패했습니다. 다시 시도해주세요.")
+      } else {
+        console.log("✅ OAuth redirect initiated:", data)
+      }
+    } catch (error) {
+      console.error("❌ Unexpected error:", error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -35,7 +67,8 @@ export default function LoginPage() {
           <Button
             onClick={handleGoogleLogin}
             variant="outline"
-            className="w-full rounded-xl border-gray-300 bg-white py-6 text-base font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:shadow-md"
+            disabled={loading}
+            className="w-full rounded-xl border-gray-300 bg-white py-6 text-base font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:shadow-md disabled:opacity-50"
             size="lg"
           >
             <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
@@ -56,7 +89,7 @@ export default function LoginPage() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            {t.continueWithGoogle}
+            {loading ? "로그인 중..." : t.continueWithGoogle}
           </Button>
 
           <p className="text-center text-xs text-gray-500">
