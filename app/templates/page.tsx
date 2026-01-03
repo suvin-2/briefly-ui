@@ -1,16 +1,14 @@
 "use client"
 
-import { useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { TemplateUploadModal } from "@/components/template-upload-modal"
-import { Plus, FileSpreadsheet, FileText, Download, X } from "lucide-react"
+import { Plus, FileSpreadsheet, FileText, Download, X, Clock } from "lucide-react"
+import { toast } from "sonner"
 import { useLanguage } from "@/lib/language-context"
 
 export default function TemplatesPage() {
   const { t } = useLanguage()
-  const [uploadModalOpen, setUploadModalOpen] = useState(false)
 
   const templates = [
     {
@@ -40,6 +38,13 @@ export default function TemplatesPage() {
     console.log("Delete template:", id)
   }
 
+  const handleUploadClick = () => {
+    toast.info("템플릿 업로드 기능은 준비 중입니다.", {
+      description: "곧 사용하실 수 있습니다!",
+      icon: <Clock className="h-4 w-4" />,
+    })
+  }
+
   return (
     <AppShell>
       <div className="w-full space-y-6 px-4 md:px-0">
@@ -49,13 +54,18 @@ export default function TemplatesPage() {
             <h1 className="text-balance text-3xl font-bold text-gray-900">{t.templates}</h1>
             <p className="text-pretty text-gray-600">{t.templatesLibrary}</p>
           </div>
-          <Button
-            onClick={() => setUploadModalOpen(true)}
-            className="hidden bg-[#5D7AA5] text-white hover:bg-[#4d6a95] md:flex"
-          >
-            <Plus className="mr-2 h-5 w-5" />
-            {t.uploadTemplate}
-          </Button>
+          <div className="relative">
+            <Button
+              onClick={handleUploadClick}
+              className="hidden bg-[#5D7AA5] text-white hover:bg-[#4d6a95] md:flex"
+            >
+              <Plus className="mr-2 h-5 w-5" />
+              {t.uploadTemplate}
+            </Button>
+            <span className="absolute -right-2 -top-2 hidden rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white md:block">
+              준비중
+            </span>
+          </div>
         </div>
 
         {/* Template Cards - Force single column on mobile */}
@@ -98,15 +108,18 @@ export default function TemplatesPage() {
         </div>
 
         {/* Mobile FAB for Upload */}
-        <button
-          onClick={() => setUploadModalOpen(true)}
-          className="fixed bottom-20 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-[#5D7AA5] text-white shadow-lg transition-colors hover:bg-[#4A6285] md:hidden"
-        >
-          <Plus className="h-6 w-6" />
-        </button>
+        <div className="fixed bottom-20 right-4 z-40 md:hidden">
+          <button
+            onClick={handleUploadClick}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#5D7AA5] text-white shadow-lg transition-colors hover:bg-[#4A6285]"
+          >
+            <Plus className="h-6 w-6" />
+          </button>
+          <span className="absolute -right-1 -top-1 rounded-full bg-amber-500 px-1 py-0.5 text-[8px] font-bold text-white">
+            준비중
+          </span>
+        </div>
       </div>
-
-      <TemplateUploadModal open={uploadModalOpen} onOpenChange={setUploadModalOpen} />
     </AppShell>
   )
 }
