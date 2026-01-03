@@ -6,6 +6,7 @@ import { WeeklyDateStrip } from "@/components/weekly-date-strip"
 import { TodoItem } from "@/components/todo-item"
 import { TodoInput } from "@/components/todo-input"
 import { TodoDetailModal } from "@/components/todo-detail-modal"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { useLanguage } from "@/lib/language-context"
 import { useTodos } from "@/hooks/use-todos"
 import type { Todo } from "@/types"
@@ -63,9 +64,7 @@ export default function HomePage() {
 
         {/* Todo List - Responsive Grid */}
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-gray-500">Loading...</div>
-          </div>
+          <LoadingSpinner text="할 일을 불러오는 중..." />
         ) : todos.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-gray-500">
             <p>할 일이 없습니다.</p>

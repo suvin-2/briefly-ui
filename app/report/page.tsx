@@ -5,6 +5,7 @@ import { AppShell } from "@/components/app-shell"
 import { ReportCard } from "@/components/report-card"
 import { GenerateReportDialog } from "@/components/generate-report-dialog"
 import { Button } from "@/components/ui/button"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Plus } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
 import { useLanguage } from "@/lib/language-context"
@@ -83,9 +84,7 @@ export default function ReportPage() {
 
         {/* Loading State */}
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-gray-500">Loading...</div>
-          </div>
+          <LoadingSpinner text="리포트를 불러오는 중..." />
         ) : reports.length === 0 ? (
           /* Empty State */
           <div className="flex flex-col items-center justify-center py-16 text-gray-500">
