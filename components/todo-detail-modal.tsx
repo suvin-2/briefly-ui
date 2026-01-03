@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, AlertTriangle } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import type { Todo } from "@/types"
@@ -36,15 +36,24 @@ export function TodoDetailModal({ open, onOpenChange, todo, onSave, onDelete }: 
   const [targetDate, setTargetDate] = useState<Date | undefined>(undefined)
   const [memo, setMemo] = useState("")
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
+  const [originalDate, setOriginalDate] = useState<Date | undefined>(undefined)
 
   // Update state when todo changes
   useEffect(() => {
     if (todo) {
       setText(todo.text)
       setTargetDate(todo.targetDate)
+      setOriginalDate(todo.targetDate)
       setMemo(todo.memo || "")
     }
   }, [todo])
+
+  // 날짜가 변경되었는지 확인
+  const isDateChanged = (() => {
+    if (!originalDate && !targetDate) return false
+    if (!originalDate || !targetDate) return true
+    return originalDate.toDateString() !== targetDate.toDateString()
+  })()
 
   const handleSave = () => {
     if (todo) {
@@ -110,6 +119,12 @@ export function TodoDetailModal({ open, onOpenChange, todo, onSave, onDelete }: 
                   <Calendar mode="single" selected={targetDate} onSelect={setTargetDate} initialFocus />
                 </PopoverContent>
               </Popover>
+              {isDateChanged && (
+                <div className="flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700">
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  <span>날짜를 변경하면 해당 날짜의 할 일 목록으로 이동합니다.</span>
+                </div>
+              )}
             </div>
 
             {/* Memo / Retrospective Area */}
