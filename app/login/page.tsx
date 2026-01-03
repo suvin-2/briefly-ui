@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/components/auth-provider"
 import { supabase } from "@/lib/supabase"
+import { toast } from "sonner"
 
 export default function LoginPage() {
   const { t } = useLanguage()
@@ -33,7 +34,7 @@ export default function LoginPage() {
 
       if (error) {
         console.error("❌ Google login error:", error)
-        alert("로그인에 실패했습니다. 다시 시도해주세요.")
+        toast.error("로그인에 실패했습니다. 다시 시도해주세요.")
       } else {
         console.log("✅ OAuth redirect initiated:", data)
       }

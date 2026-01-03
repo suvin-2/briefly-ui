@@ -228,7 +228,25 @@ export function ReportCard({ report, onDelete }: ReportCardProps) {
       toast.success("PDF 다운로드 완료")
     } catch (error) {
       console.error("PDF generation failed:", error)
-      alert("PDF 생성 중 오류가 발생했습니다.")
+
+      // 에러 유형에 따른 메시지 분기
+      let errorMessage = "PDF 생성 중 오류가 발생했습니다."
+
+      if (error instanceof Error) {
+        if (error.message.includes("network") || error.message.includes("fetch")) {
+          errorMessage = "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."
+        } else if (error.message.includes("memory") || error.message.includes("heap")) {
+          errorMessage = "메모리 부족으로 PDF 생성에 실패했습니다. 페이지를 새로고침 후 다시 시도해주세요."
+        }
+      }
+
+      toast.error(errorMessage, {
+        description: "문제가 지속되면 Markdown으로 다운로드해주세요.",
+        action: {
+          label: "다시 시도",
+          onClick: () => handleDownloadPdf(),
+        },
+      })
     } finally {
       // 10. 뒷정리 (가림막과 리포트 컨테이너 제거)
       if (overlay && document.body.contains(overlay)) {
