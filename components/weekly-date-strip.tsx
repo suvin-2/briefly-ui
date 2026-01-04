@@ -174,7 +174,7 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
           <div className="relative min-w-0 flex-1 md:hidden">
             {/* Left fade gradient - only visible when can scroll left */}
             {canScrollLeft && (
-              <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-8 bg-gradient-to-r from-white to-transparent" />
+              <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-6 bg-gradient-to-r from-white/70 via-white/40 to-transparent" />
             )}
 
             <div
@@ -217,7 +217,7 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
 
             {/* Right fade gradient - only visible when can scroll right */}
             {canScrollRight && (
-              <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-8 bg-gradient-to-l from-white to-transparent" />
+              <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-6 bg-gradient-to-l from-white/70 via-white/40 to-transparent" />
             )}
           </div>
 
