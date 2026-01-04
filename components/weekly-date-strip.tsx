@@ -180,7 +180,7 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
             <div
               ref={scrollContainerRef}
               onScroll={checkScroll}
-              className="scrollbar-hide flex snap-x snap-mandatory gap-1 overflow-x-auto py-1 px-0.5"
+              className="scrollbar-hide flex snap-x snap-mandatory gap-1 overflow-x-auto p-2"
             >
               {mobileDates.map((item, idx) => {
                 const dayOfWeek = item.date.getDay()
