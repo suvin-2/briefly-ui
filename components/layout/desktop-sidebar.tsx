@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { Home, FileText, Layout, User, Beaker } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/language-context"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 export function DesktopSidebar() {
   const pathname = usePathname()
@@ -50,7 +51,7 @@ export function DesktopSidebar() {
             })}
           </nav>
 
-          <div className="border-t border-gray-200/50 p-4">
+          <div className="border-t border-gray-200/50 p-4 space-y-2">
             <Link
               href="/ui-guide"
               className={cn(
@@ -65,6 +66,9 @@ export function DesktopSidebar() {
               <Beaker className="h-5 w-5" aria-hidden="true" />
               {t.uiGuide}
             </Link>
+            <div className="flex items-center justify-center pt-2">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </div>

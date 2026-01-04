@@ -128,7 +128,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
   }
 
   /* WCAG AA 접근성 - 향상된 포커스 링 */

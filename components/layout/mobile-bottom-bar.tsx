@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { Home, FileText, Layout, User, Beaker } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/language-context"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 export function MobileBottomBar() {
   const pathname = usePathname()
@@ -29,7 +30,7 @@ export function MobileBottomBar() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center gap-1 rounded-lg px-4 py-2 transition-colors",
+                  "flex flex-col items-center gap-1 rounded-lg px-3 py-2 transition-colors",
                   isActive ? "bg-white text-gray-900" : "text-gray-600 hover:text-gray-900",
                   item.isDev && !isActive && "text-gray-400",
                 )}
@@ -41,6 +42,10 @@ export function MobileBottomBar() {
               </Link>
             )
           })}
+          <div className="flex flex-col items-center gap-1 px-3 py-2">
+            <ThemeToggle />
+            <span className="text-xs font-medium text-gray-600">테마</span>
+          </div>
         </div>
       </div>
     </nav>

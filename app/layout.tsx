@@ -7,6 +7,7 @@ import { AuthProvider } from "@/components/auth-provider"
 import { QueryProvider } from "@/components/query-provider"
 import { ProgressBarProvider } from "@/components/progress-bar-provider"
 import { SrOnlyAnnouncer } from "@/components/sr-only-announcer"
+import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
@@ -42,22 +43,24 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        <a href="#main-content" className="skip-to-main">
-          메인 콘텐츠로 이동
-        </a>
-        <ProgressBarProvider>
-          <QueryProvider>
-            <AuthProvider>
-              <SrOnlyAnnouncer>
-                <LanguageProvider>{children}</LanguageProvider>
-              </SrOnlyAnnouncer>
-            </AuthProvider>
-          </QueryProvider>
-        </ProgressBarProvider>
-        <Toaster />
-        <Analytics />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <a href="#main-content" className="skip-to-main">
+            메인 콘텐츠로 이동
+          </a>
+          <ProgressBarProvider>
+            <QueryProvider>
+              <AuthProvider>
+                <SrOnlyAnnouncer>
+                  <LanguageProvider>{children}</LanguageProvider>
+                </SrOnlyAnnouncer>
+              </AuthProvider>
+            </QueryProvider>
+          </ProgressBarProvider>
+          <Toaster />
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   )
