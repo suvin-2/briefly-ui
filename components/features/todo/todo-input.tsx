@@ -36,7 +36,7 @@ export function TodoInput({ onAdd }: TodoInputProps) {
   const isNearLimit = value.length >= MAX_LENGTH * 0.8
 
   return (
-    <form onSubmit={handleSubmit} className="border-white/50 bg-white/70 backdrop-blur-md rounded-xl border p-3">
+    <form onSubmit={handleSubmit} className="border-white/50 bg-white/70 backdrop-blur-md rounded-xl border p-3 dark:border-zinc-800 dark:bg-zinc-950">
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <Input
@@ -44,13 +44,13 @@ export function TodoInput({ onAdd }: TodoInputProps) {
             onChange={handleChange}
             placeholder="Add a new task..."
             maxLength={MAX_LENGTH}
-            className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 pr-14"
+            className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 pr-14 dark:text-zinc-200 dark:placeholder:text-zinc-500"
           />
           {value.length > 0 && (
             <span
               className={cn(
                 "absolute right-2 top-1/2 -translate-y-1/2 text-xs",
-                isOverLimit ? "text-red-500 font-medium" : isNearLimit ? "text-amber-500" : "text-gray-400"
+                isOverLimit ? "text-red-500 font-medium dark:text-red-400" : isNearLimit ? "text-amber-500 dark:text-amber-400" : "text-gray-400 dark:text-zinc-500"
               )}
             >
               {value.length}/{MAX_LENGTH}
@@ -60,7 +60,7 @@ export function TodoInput({ onAdd }: TodoInputProps) {
         <Button
           type="submit"
           size="icon"
-          className="h-9 w-9 shrink-0 bg-gray-900 text-white hover:bg-gray-800"
+          className="h-9 w-9 shrink-0 bg-gray-900 text-white hover:bg-gray-800 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-200"
           disabled={!value.trim() || isOverLimit}
         >
           <Plus className="h-4 w-4" />

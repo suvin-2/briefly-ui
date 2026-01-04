@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export function TodoSkeleton() {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+    <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-transparent">
       <Skeleton className="h-5 w-5 rounded" />
       <div className="flex-1 space-y-2">
         <Skeleton className="h-4 w-3/4" />
