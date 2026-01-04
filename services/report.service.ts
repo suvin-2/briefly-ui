@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase"
 import type { Report, Todo } from "@/types"
 import { formatLocalDate } from "./todo.service"
+import { generateReportByTemplate, type TemplateType } from "@/lib/report-templates"
 
 // ========================================
 // Database 타입 (Supabase 스키마와 일치)
@@ -53,12 +54,14 @@ export async function getReports(): Promise<Report[]> {
  * @param startDate - 기간 시작일
  * @param endDate - 기간 종료일
  * @param todos - 해당 기간의 완료된 투두 목록
+ * @param templateType - 사용할 템플릿 타입 (기본값: "basic")
  */
 export async function createReport(
   title: string,
   startDate: Date,
   endDate: Date,
   todos: Todo[],
+  templateType: TemplateType = "basic",
 ): Promise<Report> {
   const {
     data: { user },
@@ -68,8 +71,8 @@ export async function createReport(
     throw new Error("User not authenticated")
   }
 
-  // MVP: 간단한 마크다운 생성 (날짜별로 정리)
-  const summary = generateBasicMarkdown(todos, startDate, endDate)
+  // 선택된 템플릿으로 마크다운 생성
+  const summary = generateReportByTemplate(templateType, todos, startDate, endDate)
 
   const { data, error } = await supabase
     .from("reports")
@@ -92,6 +95,31 @@ export async function createReport(
 }
 
 /**
+ * 리포트 수정
+ */
+export async function updateReport(
+  id: string,
+  updates: { title?: string; summary?: string }
+): Promise<Report> {
+  const { data, error } = await supabase
+    .from("reports")
+    .update({
+      title: updates.title,
+      summary: updates.summary,
+    })
+    .eq("id", id)
+    .select()
+    .single()
+
+  if (error) {
+    console.error("Error updating report:", error)
+    throw new Error(error.message)
+  }
+
+  return fromDatabase(data as DatabaseReport)
+}
+
+/**
  * 리포트 삭제
  */
 export async function deleteReport(id: string): Promise<void> {
@@ -103,116 +131,229 @@ export async function deleteReport(id: string): Promise<void> {
   }
 }
 
-// ========================================
-// Helper Functions
-// ========================================
+/**
+ * PDF 생성을 위한 오버레이 생성
+ */
+function createPdfOverlay(message: string): HTMLDivElement {
+  const overlay = document.createElement("div")
+  Object.assign(overlay.style, {
+    position: "fixed",
+    top: "0",
+    left: "0",
+    width: "100vw",
+    height: "100vh",
+    backgroundColor: "#ffffff",
+    zIndex: "9999",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "18px",
+    fontWeight: "bold",
+    color: "#5D7AA5",
+    fontFamily: "Pretendard Variable, Pretendard, -apple-system, sans-serif",
+  })
+  overlay.innerText = message
+  return overlay
+}
 
 /**
- * 투두 목록을 전문적인 업무 보고서 스타일 마크다운으로 생성
+ * PDF를 위한 리포트 컨테이너(A4) 생성
  */
-function generateBasicMarkdown(todos: Todo[], startDate: Date, endDate: Date): string {
-  const allTodos = todos // 전체 투두 (완료 + 미완료 포함)
-  const completedTodos = todos.filter((todo) => todo.completed)
-  const pendingTodos = todos.filter((todo) => !todo.completed)
-
-  // 달성률 계산
-  const totalTasks = allTodos.length
-  const completionRate = totalTasks > 0 ? Math.round((completedTodos.length / totalTasks) * 100) : 0
-
-  // memo가 있는 항목만 필터링 (이슈/인사이트)
-  const todosWithMemo = completedTodos.filter((todo) => todo.memo && todo.memo.trim() !== "")
-
-  // 날짜별로 그룹화
-  const completedByDate: Record<string, Todo[]> = {}
-  completedTodos.forEach((todo) => {
-    if (todo.targetDate) {
-      const dateKey = formatLocalDate(todo.targetDate)
-      if (!completedByDate[dateKey]) {
-        completedByDate[dateKey] = []
-      }
-      completedByDate[dateKey].push(todo)
-    }
+function createReportContainer(): HTMLDivElement {
+  const container = document.createElement("div")
+  Object.assign(container.style, {
+    position: "fixed",
+    top: "0",
+    left: "0",
+    width: "210mm",
+    minHeight: "297mm",
+    backgroundColor: "#ffffff",
+    color: "#000000",
+    zIndex: "9998",
+    padding: "20mm",
+    boxSizing: "border-box",
+    fontFamily: "Pretendard Variable, Pretendard, -apple-system, sans-serif",
   })
-
-  // 마크다운 생성
-  let markdown = ""
-
-  // ========================================
-  // 1. 헤더
-  // ========================================
-  markdown += `# 📋 Weekly Report\n\n`
-  markdown += `**기간:** ${formatLocalDate(startDate)} ~ ${formatLocalDate(endDate)}\n\n`
-  markdown += `---\n\n`
-
-  // ========================================
-  // 2. 요약 (Summary)
-  // ========================================
-  markdown += `## 📊 Summary\n\n`
-  markdown += `- **전체 업무:** ${totalTasks}건\n`
-  markdown += `- **완료:** ${completedTodos.length}건\n`
-  markdown += `- **진행 중:** ${pendingTodos.length}건\n`
-  markdown += `- **달성률:** ${completionRate}%\n\n`
-  markdown += `---\n\n`
-
-  // ========================================
-  // 3. 업무 내역 - 완료된 작업
-  // ========================================
-  markdown += `## ✅ Completed Tasks\n\n`
-
-  if (completedTodos.length === 0) {
-    markdown += `완료된 업무가 없습니다.\n\n`
-  } else {
-    // 날짜순으로 정렬
-    const sortedDates = Object.keys(completedByDate).sort()
-
-    sortedDates.forEach((dateKey) => {
-      const dateTodos = completedByDate[dateKey]
-      markdown += `### ${dateKey}\n\n`
-
-      dateTodos.forEach((todo) => {
-        markdown += `- [✅] ${todo.text}\n`
-      })
-
-      markdown += `\n`
-    })
-  }
-
-  markdown += `---\n\n`
-
-  // ========================================
-  // 4. 업무 내역 - 진행 중
-  // ========================================
-  if (pendingTodos.length > 0) {
-    markdown += `## 🔄 In Progress\n\n`
-
-    pendingTodos.forEach((todo) => {
-      markdown += `- [ ] ${todo.text}\n`
-    })
-
-    markdown += `\n---\n\n`
-  }
-
-  // ========================================
-  // 5. 이슈 / 인사이트
-  // ========================================
-  if (todosWithMemo.length > 0) {
-    markdown += `## 💡 Issues & Insights\n\n`
-
-    todosWithMemo.forEach((todo) => {
-      markdown += `### ${todo.text}\n\n`
-      markdown += `> ${todo.memo}\n\n`
-    })
-
-    markdown += `---\n\n`
-  }
-
-  // ========================================
-  // 6. 차주 계획 (Next Week Plan)
-  // ========================================
-  markdown += `## 📅 Next Week Plan\n\n`
-  markdown += `- [ ] 다음 주 업무 계획을 작성하세요\n`
-  markdown += `- [ ] 우선순위를 정리하세요\n`
-  markdown += `- [ ] 필요한 리소스를 확인하세요\n\n`
-
-  return markdown
+  return container
 }
+
+/**
+ * PDF 스타일 태그 생성
+ */
+function createPdfStyleTag(): HTMLStyleElement {
+  const styleTag = document.createElement("style")
+  styleTag.innerHTML = `
+    .pdf-content {
+      font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+      color: #000000;
+      font-size: 14px;
+    }
+    .pdf-content h1 {
+      font-size: 20px;
+      color: #333;
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+      margin-top: 20px;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+    .pdf-content h2 {
+      font-size: 18px;
+      color: #555;
+      margin-top: 15px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    .pdf-content h3 {
+      font-size: 16px;
+      color: #666;
+      margin-top: 10px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+    .pdf-content ul {
+      padding-left: 20px;
+      margin-bottom: 10px;
+    }
+    .pdf-content ol {
+      padding-left: 20px;
+      margin-bottom: 10px;
+    }
+    .pdf-content li {
+      margin-bottom: 4px;
+      line-height: 1.6;
+    }
+    .pdf-content p {
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+    .pdf-content blockquote {
+      border-left: 4px solid #5D7AA5;
+      padding-left: 10px;
+      color: #666;
+      margin: 10px 0;
+      font-style: italic;
+    }
+    .pdf-content code {
+      background-color: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 13px;
+    }
+    .pdf-content pre {
+      background-color: #f5f5f5;
+      padding: 12px;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin-bottom: 10px;
+    }
+    .pdf-content strong {
+      font-weight: bold;
+    }
+    .pdf-content em {
+      font-style: italic;
+    }
+  `
+  return styleTag
+}
+
+/**
+ * 리포트 헤더 추가 (제목 + 날짜 범위 + 구분선)
+ */
+function addReportHeader(container: HTMLDivElement, report: Report): void {
+  const title = document.createElement("h1")
+  title.innerText = report.title || "Weekly Report"
+  title.style.fontSize = "24px"
+  title.style.fontWeight = "bold"
+  title.style.marginBottom = "12px"
+  title.style.color = "#5D7AA5"
+  title.style.fontFamily = "Pretendard Variable, Pretendard, -apple-system, sans-serif"
+  container.appendChild(title)
+
+  const dateRange = document.createElement("p")
+  dateRange.innerText = `${formatLocalDate(report.startDate)} ~ ${formatLocalDate(report.endDate)}`
+  dateRange.style.fontSize = "12px"
+  dateRange.style.color = "#666666"
+  dateRange.style.marginBottom = "24px"
+  dateRange.style.fontFamily = "Pretendard Variable, Pretendard, -apple-system, sans-serif"
+  container.appendChild(dateRange)
+
+  const divider = document.createElement("hr")
+  divider.style.border = "none"
+  divider.style.borderTop = "2px solid #5D7AA5"
+  divider.style.marginBottom = "20px"
+  container.appendChild(divider)
+}
+
+/**
+ * 리포트를 PDF로 다운로드
+ * @param report - PDF로 변환할 리포트 객체
+ * @param overlayMessage - 오버레이에 표시할 메시지
+ */
+export async function downloadReportAsPdf(
+  report: Report,
+  overlayMessage: string = "PDF 문서를 생성하고 있습니다..."
+): Promise<void> {
+  let overlay: HTMLDivElement | null = null
+  let reportContainer: HTMLDivElement | null = null
+
+  try {
+    // 1. 오버레이 생성 및 표시
+    overlay = createPdfOverlay(overlayMessage)
+    document.body.appendChild(overlay)
+
+    // 2. marked 라이브러리 import
+    const { marked } = await import("marked")
+
+    // 3. 리포트 컨테이너 생성
+    reportContainer = createReportContainer()
+    reportContainer.appendChild(createPdfStyleTag())
+    addReportHeader(reportContainer, report)
+
+    // 4. Markdown을 HTML로 변환하여 주입
+    const htmlContent = await marked.parse(report.summary)
+    const contentContainer = document.createElement("div")
+    contentContainer.className = "pdf-content"
+    contentContainer.innerHTML = htmlContent
+    reportContainer.appendChild(contentContainer)
+
+    // DOM에 추가 (캡처를 위해 필수)
+    document.body.appendChild(reportContainer)
+
+    // 5. 렌더링 대기
+    await document.fonts.ready
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    // 6. 이미지 변환
+    const { toPng } = await import("html-to-image")
+    const dataUrl = await toPng(reportContainer, {
+      quality: 0.95,
+      backgroundColor: "#ffffff",
+      pixelRatio: 2,
+    })
+
+    // 7. PDF 생성 및 저장
+    const { jsPDF } = await import("jspdf")
+    const pdf = new jsPDF("p", "mm", "a4")
+    const imgProps = pdf.getImageProperties(dataUrl)
+    const pdfHeight = (imgProps.height * 210) / imgProps.width
+
+    pdf.addImage(dataUrl, "PNG", 0, 0, 210, pdfHeight)
+
+    // 파일명 생성
+    const dateStr = formatLocalDate(report.startDate).replace(/-/g, "")
+    const filename = `Report_${dateStr}.pdf`
+    pdf.save(filename)
+  } finally {
+    // 8. 뒷정리
+    if (overlay && document.body.contains(overlay)) {
+      document.body.removeChild(overlay)
+    }
+    if (reportContainer && document.body.contains(reportContainer)) {
+      document.body.removeChild(reportContainer)
+    }
+  }
+}
+
+// Note: 모든 템플릿 생성 로직은 lib/report-templates.ts로 이동되었습니다.
