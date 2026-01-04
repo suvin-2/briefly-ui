@@ -4,6 +4,9 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { LanguageProvider } from "@/lib/language-context"
 import { AuthProvider } from "@/components/auth-provider"
+import { QueryProvider } from "@/components/query-provider"
+import { ProgressBarProvider } from "@/components/progress-bar-provider"
+import { SrOnlyAnnouncer } from "@/components/sr-only-announcer"
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
@@ -39,11 +42,20 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body className={`font-sans antialiased`}>
-        <AuthProvider>
-          <LanguageProvider>{children}</LanguageProvider>
-        </AuthProvider>
+        <a href="#main-content" className="skip-to-main">
+          메인 콘텐츠로 이동
+        </a>
+        <ProgressBarProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <SrOnlyAnnouncer>
+                <LanguageProvider>{children}</LanguageProvider>
+              </SrOnlyAnnouncer>
+            </AuthProvider>
+          </QueryProvider>
+        </ProgressBarProvider>
         <Toaster />
         <Analytics />
       </body>
