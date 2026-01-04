@@ -146,16 +146,16 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">{weekRangeDisplay}</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-slate-50">{weekRangeDisplay}</h2>
       </div>
 
-      <div className="max-w-full rounded-xl border border-white/50 bg-white/70 backdrop-blur-md">
+      <div className="max-w-full rounded-xl border border-white/50 bg-white/70 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900">
         <div className="relative flex items-center gap-2 p-0">
           <Button
             variant="ghost"
             size="icon"
             onClick={handlePrev}
-            className="relative z-20 h-8 w-8 shrink-0 border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50"
+            className="relative z-20 h-8 w-8 shrink-0 border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -185,10 +185,10 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
                         ? "bg-[#5D7AA5] text-white"
                         : isWeekend
                           ? isSunday
-                            ? "bg-rose-50 text-rose-600 hover:bg-rose-100"
-                            : "bg-blue-50 text-blue-600 hover:bg-blue-100"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200",
-                      item.isToday && "ring-2 ring-[#5D7AA5] ring-offset-2",
+                            ? "bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-slate-900 dark:text-rose-400 dark:hover:bg-slate-800"
+                            : "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-slate-900 dark:text-blue-400 dark:hover:bg-slate-800"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800",
+                      item.isToday && "ring-2 ring-[#5D7AA5] ring-offset-2 dark:ring-slate-400",
                     )}
                   >
                     <span className="text-[9px] font-medium uppercase">{item.day}</span>
@@ -213,13 +213,13 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
                   className={cn(
                     "flex flex-col items-center rounded-lg px-3 py-2 transition-all",
                     selectedDesktopIndex === idx
-                      ? "bg-gray-900 text-white"
+                      ? "bg-gray-900 text-white dark:bg-slate-50 dark:text-slate-900"
                       : isWeekend
                         ? isSunday
-                          ? "bg-rose-50 text-rose-600 hover:bg-rose-100"
-                          : "bg-blue-50 text-blue-600 hover:bg-blue-100"
-                        : "bg-gray-100 text-gray-500 hover:bg-gray-200",
-                    item.isToday && "ring-2 ring-gray-900 ring-offset-2",
+                          ? "bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-slate-900 dark:text-rose-400 dark:hover:bg-slate-800"
+                          : "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-slate-900 dark:text-blue-400 dark:hover:bg-slate-800"
+                        : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800",
+                    item.isToday && "ring-2 ring-gray-900 ring-offset-2 dark:ring-slate-400",
                   )}
                 >
                   <span className="text-xs font-medium">{item.day}</span>
@@ -233,7 +233,7 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
             variant="ghost"
             size="icon"
             onClick={handleNext}
-            className="relative z-20 h-8 w-8 shrink-0 border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50"
+            className="relative z-20 h-8 w-8 shrink-0 border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
