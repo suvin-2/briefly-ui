@@ -4,21 +4,26 @@ import { useState, useEffect } from "react"
 import { AppShell } from "@/components/app-shell"
 import { ReportCard } from "@/components/report-card"
 import { GenerateReportDialog } from "@/components/generate-report-dialog"
+import { EditReportDialog } from "@/components/edit-report-dialog"
 import { Button } from "@/components/ui/button"
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
+import { ReportListSkeleton } from "@/components/report-skeleton"
 import { Plus } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
 import { useLanguage } from "@/lib/language-context"
 import type { Report } from "@/types"
 import * as reportService from "@/services/report.service"
 import { toast } from "sonner"
+import { useOptimisticMutation, optimisticArrayHelpers } from "@/hooks/use-optimistic-mutation"
 
 export default function ReportPage() {
   const { t } = useLanguage()
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null)
   const [reports, setReports] = useState<Report[]>([])
   const [loading, setLoading] = useState(true)
   const isMobile = useMobile()
+  const { mutate } = useOptimisticMutation<Report[]>()
 
   // 리포트 목록 조회
   useEffect(() => {
@@ -45,18 +50,29 @@ export default function ReportPage() {
   }
 
   const handleDelete = async (id: string) => {
-    // Optimistic UI
-    const previousReports = [...reports]
-    setReports((prev) => prev.filter((report) => report.id !== id))
+    await mutate(reports, setReports, optimisticArrayHelpers.remove(id), () => reportService.deleteReport(id), {
+      successMessage: "리포트가 삭제되었습니다",
+      errorMessage: "리포트 삭제에 실패했습니다",
+    })
+  }
 
+  const handleEdit = (id: string) => {
+    const report = reports.find((r) => r.id === id)
+    if (report) {
+      setSelectedReport(report)
+      setEditDialogOpen(true)
+    }
+  }
+
+  const handleSaveEdit = async (id: string, updates: { title: string; summary: string }) => {
     try {
-      await reportService.deleteReport(id)
-      toast.success("리포트가 삭제되었습니다")
+      const updatedReport = await reportService.updateReport(id, updates)
+      setReports((prev) => prev.map((report) => (report.id === id ? updatedReport : report)))
+      toast.success(t.reportUpdated)
     } catch (error) {
-      console.error("Failed to delete report:", error)
-      toast.error("리포트 삭제에 실패했습니다")
-      // 롤백
-      setReports(previousReports)
+      console.error("Failed to update report:", error)
+      toast.error(t.reportUpdateFailed)
+      throw error
     }
   }
 
@@ -84,18 +100,18 @@ export default function ReportPage() {
 
         {/* Loading State */}
         {loading ? (
-          <LoadingSpinner text="리포트를 불러오는 중..." />
+          <ReportListSkeleton />
         ) : reports.length === 0 ? (
           /* Empty State */
-          <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-16 text-gray-500" role="status">
             <p className="text-lg font-medium">생성된 리포트가 없습니다</p>
             <p className="mt-2 text-sm">새 리포트를 만들어보세요!</p>
           </div>
         ) : (
           /* Report List */
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3" role="list" aria-label="리포트 목록">
             {reports.map((report) => (
-              <ReportCard key={report.id} report={report} onDelete={handleDelete} />
+              <ReportCard key={report.id} report={report} onDelete={handleDelete} onEdit={handleEdit} />
             ))}
           </div>
         )}
@@ -105,6 +121,7 @@ export default function ReportPage() {
           <button
             onClick={() => setDialogOpen(true)}
             className="fixed bottom-20 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-[#5D7AA5] text-white shadow-lg transition-colors hover:bg-[#4A6285]"
+            aria-label="새 리포트 생성"
           >
             <Plus className="h-6 w-6" />
           </button>
@@ -112,6 +129,14 @@ export default function ReportPage() {
 
         {/* Generate Report Dialog */}
         <GenerateReportDialog open={dialogOpen} onOpenChange={setDialogOpen} onReportCreated={handleReportCreated} />
+
+        {/* Edit Report Dialog */}
+        <EditReportDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          report={selectedReport}
+          onSave={handleSaveEdit}
+        />
       </div>
     </AppShell>
   )
