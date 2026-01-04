@@ -11,7 +11,13 @@
       "Bash(timeout 15 bash:*)",
       "Bash(timeout 30 bash:*)",
       "Bash(rm:*)",
-      "Bash(npx next dev:*)"
+      "Bash(npx next dev:*)",
+      "Bash(timeout 15 npm run dev:*)",
+      "Bash(cat:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(pkill:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
