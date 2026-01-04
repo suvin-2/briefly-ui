@@ -16,7 +16,10 @@ interface TodoItemProps {
 export function TodoItem({ id, text, completed, onToggle, onMemo }: TodoItemProps) {
   return (
     <div
-      className="group rounded-xl border border-white/50 bg-white/70 p-4 backdrop-blur-md transition-all hover:bg-white/80"
+      className={cn(
+        "group rounded-xl border border-white/50 bg-white/70 p-4 backdrop-blur-md transition-all hover:bg-white/80",
+        completed && "animate-in fade-in-50 zoom-in-95 duration-200"
+      )}
       role="listitem"
     >
       <div className="flex items-start gap-3">
@@ -24,13 +27,13 @@ export function TodoItem({ id, text, completed, onToggle, onMemo }: TodoItemProp
           id={id}
           checked={completed}
           onCheckedChange={() => onToggle(id)}
-          className="mt-1 border-gray-300 data-[state=checked]:border-gray-900 data-[state=checked]:bg-gray-900"
+          className="mt-1 border-gray-300 transition-all data-[state=checked]:scale-110 data-[state=checked]:border-gray-900 data-[state=checked]:bg-gray-900"
           aria-label={completed ? `${text} 완료됨` : `${text} 미완료`}
         />
         <label
           htmlFor={id}
           className={cn(
-            "flex-1 cursor-pointer text-sm leading-relaxed transition-all",
+            "flex-1 cursor-pointer text-sm leading-relaxed transition-all duration-300",
             completed ? "text-gray-400 line-through" : "text-gray-900",
           )}
         >

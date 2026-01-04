@@ -108,6 +108,7 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
   }
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const dateButtonRefs = useRef<Map<number, HTMLButtonElement>>(new Map())
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
 
@@ -124,6 +125,20 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
   useEffect(() => {
     checkScroll()
   }, [mobileDates])
+
+  // Auto-scroll selected date into view
+  useEffect(() => {
+    if (selectedMobileIndex >= 0) {
+      const selectedButton = dateButtonRefs.current.get(selectedMobileIndex)
+      if (selectedButton) {
+        selectedButton.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center',
+        })
+      }
+    }
+  }, [selectedMobileIndex, selectedDate])
 
   // 현재 보고 있는 주간의 연월 정보
   const getWeekRangeDisplay = () => {
@@ -165,24 +180,39 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
             <div
               ref={scrollContainerRef}
               onScroll={checkScroll}
-              className="scrollbar-none flex snap-x snap-mandatory gap-1 overflow-x-auto"
+              className="scrollbar-hide flex snap-x snap-mandatory gap-1 overflow-x-auto"
             >
-              {mobileDates.map((item, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => onSelectDate(item.date)}
-                  className={cn(
-                    "flex h-14 w-14 shrink-0 snap-center flex-col items-center justify-center rounded-lg transition-all",
-                    selectedMobileIndex === idx
-                      ? "bg-[#5D7AA5] text-white"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200",
-                    item.isToday && "ring-2 ring-[#5D7AA5] ring-offset-2",
-                  )}
-                >
-                  <span className="text-[9px] font-medium uppercase">{item.day}</span>
-                  <span className="text-lg font-bold">{item.dayNum}</span>
-                </button>
-              ))}
+              {mobileDates.map((item, idx) => {
+                const dayOfWeek = item.date.getDay()
+                const isSunday = dayOfWeek === 0
+                const isSaturday = dayOfWeek === 6
+                const isWeekend = isSunday || isSaturday
+
+                return (
+                  <button
+                    key={idx}
+                    ref={(el) => {
+                      if (el) dateButtonRefs.current.set(idx, el)
+                      else dateButtonRefs.current.delete(idx)
+                    }}
+                    onClick={() => onSelectDate(item.date)}
+                    className={cn(
+                      "flex h-14 w-14 shrink-0 snap-center flex-col items-center justify-center rounded-lg transition-all",
+                      selectedMobileIndex === idx
+                        ? "bg-[#5D7AA5] text-white"
+                        : isWeekend
+                          ? isSunday
+                            ? "bg-rose-50 text-rose-600 hover:bg-rose-100"
+                            : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                      item.isToday && "ring-2 ring-[#5D7AA5] ring-offset-2",
+                    )}
+                  >
+                    <span className="text-[9px] font-medium uppercase">{item.day}</span>
+                    <span className="text-lg font-bold">{item.dayNum}</span>
+                  </button>
+                )
+              })}
             </div>
 
             {/* Right fade gradient - only visible when can scroll right */}

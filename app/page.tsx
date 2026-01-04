@@ -10,6 +10,7 @@ import { TodoListSkeleton } from "@/components/todo-skeleton"
 import { useLanguage } from "@/lib/language-context"
 import { useTodos } from "@/hooks/use-todos"
 import type { Todo } from "@/types"
+import { ListTodo } from "lucide-react"
 
 export default function HomePage() {
   const { t } = useLanguage()
@@ -47,7 +48,7 @@ export default function HomePage() {
 
   return (
     <AppShell>
-      <div className="w-full space-y-6 px-4 md:px-0">
+      <div className="w-full space-y-6 px-4 pb-28 md:px-0 md:pb-0">
         {/* Header */}
         <div className="mb-6 space-y-2">
           <h1 className="text-balance text-3xl font-bold text-gray-900">{t.weeklyTodos}</h1>
@@ -66,9 +67,14 @@ export default function HomePage() {
         {loading ? (
           <TodoListSkeleton />
         ) : todos.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-500" role="status">
-            <p>할 일이 없습니다.</p>
-            <p className="text-sm">새로운 할 일을 추가해보세요!</p>
+          <div className="flex flex-col items-center justify-center gap-4 py-16 text-center" role="status">
+            <div className="rounded-full bg-gray-100 p-6">
+              <ListTodo className="h-12 w-12 text-gray-400" aria-hidden="true" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-lg font-medium text-gray-900">할 일이 없습니다</p>
+              <p className="text-sm text-gray-500">새로운 할 일을 추가해보세요!</p>
+            </div>
           </div>
         ) : (
           <div className="grid gap-3 md:grid-cols-2 md:gap-4" role="list" aria-label="할 일 목록">
@@ -86,7 +92,7 @@ export default function HomePage() {
         )}
 
         {/* Mobile: Sticky Input at Bottom (above bottom nav) */}
-        <div className="fixed bottom-20 left-0 right-0 px-4 md:hidden">
+        <div className="fixed bottom-20 left-0 right-0 z-10 px-4 pb-[env(safe-area-inset-bottom)] md:hidden">
           <TodoInput onAdd={handleAdd} />
         </div>
       </div>

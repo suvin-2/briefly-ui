@@ -7,7 +7,7 @@ import { GenerateReportDialog } from "@/components/generate-report-dialog"
 import { EditReportDialog } from "@/components/edit-report-dialog"
 import { Button } from "@/components/ui/button"
 import { ReportListSkeleton } from "@/components/report-skeleton"
-import { Plus } from "lucide-react"
+import { Plus, FileText, Sparkles } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
 import { useLanguage } from "@/lib/language-context"
 import type { Report } from "@/types"
@@ -103,9 +103,21 @@ export default function ReportPage() {
           <ReportListSkeleton />
         ) : reports.length === 0 ? (
           /* Empty State */
-          <div className="flex flex-col items-center justify-center py-16 text-gray-500" role="status">
-            <p className="text-lg font-medium">생성된 리포트가 없습니다</p>
-            <p className="mt-2 text-sm">새 리포트를 만들어보세요!</p>
+          <div className="flex flex-col items-center justify-center gap-6 py-16 text-center" role="status">
+            <div className="rounded-full bg-gradient-to-br from-[#5D7AA5]/10 to-[#5D7AA5]/5 p-6">
+              <FileText className="h-12 w-12 text-[#5D7AA5]" aria-hidden="true" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-lg font-medium text-gray-900">생성된 리포트가 없습니다</p>
+              <p className="text-sm text-gray-500">완료된 할 일을 바탕으로 리포트를 만들어보세요!</p>
+            </div>
+            <Button
+              onClick={() => setDialogOpen(true)}
+              className="mt-2 bg-[#5D7AA5] text-white hover:bg-[#4d6a95]"
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              새 리포트 만들기
+            </Button>
           </div>
         ) : (
           /* Report List */
