@@ -53,7 +53,6 @@ export function useTodos() {
         text,
         completed: false,
         targetDate: selectedDate,
-        createdAt: new Date(),
       }
       queryClient.setQueryData<Todo[]>(["todos", formatLocalDate(selectedDate)], (old = []) => [
         optimisticTodo,

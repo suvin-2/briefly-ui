@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { AppShell } from "@/components/app-shell"
+import { AppShell } from "@/components/layout/app-shell"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"

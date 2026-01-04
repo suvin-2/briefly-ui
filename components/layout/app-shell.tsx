@@ -1,8 +1,8 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { DesktopSidebar } from "@/components/desktop-sidebar"
-import { MobileBottomBar } from "@/components/mobile-bottom-bar"
+import { DesktopSidebar } from "@/components/layout/desktop-sidebar"
+import { MobileBottomBar } from "@/components/layout/mobile-bottom-bar"
 
 interface AppShellProps {
   children: ReactNode

@@ -1,6 +1,6 @@
 "use client"
 
-import { AppShell } from "@/components/app-shell"
+import { AppShell } from "@/components/layout/app-shell"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"

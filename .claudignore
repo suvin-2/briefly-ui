@@ -1,0 +1,13 @@
+package-lock.json
+yarn.lock
+bun.lockb
+node_modules/
+.next/
+dist/
+public/
+*.svg
+*.png
+*.pdf
+# 번역 파일이나 데이터 파일이 크다면 추가
+locales/
+mock-data/

@@ -180,7 +180,7 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
             <div
               ref={scrollContainerRef}
               onScroll={checkScroll}
-              className="scrollbar-hide flex snap-x snap-mandatory gap-1 overflow-x-auto"
+              className="scrollbar-hide flex snap-x snap-mandatory gap-1 overflow-x-auto py-1 px-0.5"
             >
               {mobileDates.map((item, idx) => {
                 const dayOfWeek = item.date.getDay()
@@ -222,22 +222,33 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
           </div>
 
           <div className="hidden flex-1 grid-cols-7 gap-2 md:grid">
-            {desktopDates.map((item, idx) => (
-              <button
-                key={idx}
-                onClick={() => onSelectDate(item.date)}
-                className={cn(
-                  "flex flex-col items-center rounded-lg px-3 py-2 transition-all",
-                  selectedDesktopIndex === idx
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-500 hover:bg-gray-200",
-                  item.isToday && "ring-2 ring-gray-900 ring-offset-2",
-                )}
-              >
-                <span className="text-xs font-medium">{item.day}</span>
-                <span className="text-lg font-bold">{item.dayNum}</span>
-              </button>
-            ))}
+            {desktopDates.map((item, idx) => {
+              const dayOfWeek = item.date.getDay()
+              const isSunday = dayOfWeek === 0
+              const isSaturday = dayOfWeek === 6
+              const isWeekend = isSunday || isSaturday
+
+              return (
+                <button
+                  key={idx}
+                  onClick={() => onSelectDate(item.date)}
+                  className={cn(
+                    "flex flex-col items-center rounded-lg px-3 py-2 transition-all",
+                    selectedDesktopIndex === idx
+                      ? "bg-gray-900 text-white"
+                      : isWeekend
+                        ? isSunday
+                          ? "bg-rose-50 text-rose-600 hover:bg-rose-100"
+                          : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                        : "bg-gray-100 text-gray-500 hover:bg-gray-200",
+                    item.isToday && "ring-2 ring-gray-900 ring-offset-2",
+                  )}
+                >
+                  <span className="text-xs font-medium">{item.day}</span>
+                  <span className="text-lg font-bold">{item.dayNum}</span>
+                </button>
+              )
+            })}
           </div>
 
           <Button variant="ghost" size="icon" onClick={handleNext} className="h-8 w-8 shrink-0 text-gray-500">

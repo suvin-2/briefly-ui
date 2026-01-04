@@ -17,7 +17,11 @@
       "Bash(lsof:*)",
       "Bash(xargs kill:*)",
       "Bash(pkill:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(git push:*)",
+      "Bash(mkdir:*)",
+      "Bash(tree:*)",
+      "Bash(git stash:*)"
     ]
   }
 }
