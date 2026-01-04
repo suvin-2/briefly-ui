@@ -115,7 +115,7 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
   return (
     <>
       <Card
-        className="group flex h-full flex-col border-gray-200 bg-white shadow-lg transition-all hover:shadow-xl hover:shadow-gray-200/60 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none dark:hover:shadow-none"
+        className="group flex h-full flex-col border-gray-200 bg-white shadow-lg transition-all hover:shadow-xl hover:shadow-gray-200/60 dark:border-zinc-800 dark:bg-black dark:shadow-none dark:hover:shadow-none"
         role="article"
         aria-labelledby={`report-title-${report.id}`}
       >
@@ -128,7 +128,7 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
 
             <button
               onClick={handleDeleteClick}
-              className="text-gray-400 transition-colors hover:text-red-500 dark:text-slate-500 dark:hover:text-red-400"
+              className="text-gray-400 transition-colors hover:text-red-500 dark:text-zinc-500 dark:hover:text-red-400"
               aria-label={`${report.title} 리포트 삭제`}
             >
               <X className="h-5 w-5" aria-hidden="true" />
@@ -139,7 +139,7 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
         <div className="mt-4 space-y-2">
           <h3
             id={`report-title-${report.id}`}
-            className="line-clamp-2 text-balance text-xl font-bold text-gray-900 dark:text-slate-50"
+            className="line-clamp-2 text-balance text-xl font-bold text-gray-900 dark:text-zinc-50"
             title={report.title}
           >
             {report.title}
@@ -151,16 +151,16 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col justify-between space-y-4 p-6 pt-0">
-        <div className="space-y-3 rounded-2xl bg-gray-50 p-4 dark:bg-slate-800">
+        <div className="space-y-3 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-zinc-800 dark:bg-transparent">
           <div className="flex items-center justify-between gap-2 text-sm">
-            <span className="shrink-0 font-medium text-gray-500 dark:text-slate-400">{t.template}:</span>
-            <span className="truncate rounded-full bg-white px-3 py-1 text-sm font-semibold text-gray-900 shadow-sm dark:bg-slate-950/50 dark:text-slate-200 dark:shadow-none">
+            <span className="shrink-0 font-medium text-gray-500 dark:text-zinc-400">{t.template}:</span>
+            <span className="truncate rounded-full border border-gray-200 bg-white px-3 py-1 text-sm font-semibold text-gray-900 shadow-sm dark:border-zinc-800 dark:bg-transparent dark:text-zinc-50 dark:shadow-none">
               Basic Markdown
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="font-medium text-gray-500 dark:text-slate-400">{t.created}:</span>
-            <span className="font-medium text-gray-700 dark:text-slate-200">{createdAt}</span>
+            <span className="font-medium text-gray-500 dark:text-zinc-400">{t.created}:</span>
+            <span className="font-medium text-gray-700 dark:text-zinc-400">{createdAt}</span>
           </div>
         </div>
         <div className="flex gap-3 pt-2">
@@ -168,7 +168,7 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
             variant="outline"
             size="sm"
             onClick={() => onEdit(report.id)}
-            className="flex-1 rounded-xl border-gray-200 bg-white font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-200 dark:shadow-none dark:hover:border-[#5D7AA5] dark:hover:bg-[#5D7AA5] dark:hover:text-white"
+            className="flex-1 rounded-xl border-gray-200 bg-white font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white dark:border-zinc-800 dark:bg-transparent dark:text-zinc-400 dark:shadow-none dark:hover:border-[#5D7AA5] dark:hover:bg-[#5D7AA5] dark:hover:text-white"
             aria-label={`${report.title} 리포트 수정`}
           >
             <Edit className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -180,7 +180,7 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
                 variant="outline"
                 size="sm"
                 disabled={isGeneratingPdf}
-                className="flex-1 rounded-xl border-gray-200 bg-white font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-200 dark:shadow-none dark:hover:border-[#5D7AA5] dark:hover:bg-[#5D7AA5] dark:hover:text-white"
+                className="flex-1 rounded-xl border-gray-200 bg-white font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white dark:border-zinc-800 dark:bg-transparent dark:text-zinc-400 dark:shadow-none dark:hover:border-[#5D7AA5] dark:hover:bg-[#5D7AA5] dark:hover:text-white"
               >
                 <Download className="mr-2 h-4 w-4" />
                 {isGeneratingPdf ? t.generating : t.download}
@@ -201,7 +201,7 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
             variant="outline"
             size="sm"
             onClick={handleShare}
-            className="flex-1 rounded-xl border-gray-200 bg-white font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-200 dark:shadow-none dark:hover:border-[#5D7AA5] dark:hover:bg-[#5D7AA5] dark:hover:text-white"
+            className="flex-1 rounded-xl border-gray-200 bg-white font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white dark:border-zinc-800 dark:bg-transparent dark:text-zinc-400 dark:shadow-none dark:hover:border-[#5D7AA5] dark:hover:bg-[#5D7AA5] dark:hover:text-white"
             aria-label={`${report.title} 리포트 공유`}
           >
             <Share2 className="mr-2 h-4 w-4" aria-hidden="true" />
