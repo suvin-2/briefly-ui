@@ -19,7 +19,7 @@ export function MobileBottomBar() {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden" role="navigation" aria-label="모바일 메인 네비게이션">
       <div className="border-t border-gray-200/50 bg-slate-50">
         <div className="flex items-center justify-around px-2 py-2">
           {navigationItems.map((item) => {
@@ -33,8 +33,10 @@ export function MobileBottomBar() {
                   isActive ? "bg-white text-gray-900" : "text-gray-600 hover:text-gray-900",
                   item.isDev && !isActive && "text-gray-400",
                 )}
+                aria-label={item.name}
+                aria-current={isActive ? "page" : undefined}
               >
-                <item.icon className="h-5 w-5" />
+                <item.icon className="h-5 w-5" aria-hidden="true" />
                 <span className="text-xs font-medium">{item.name}</span>
               </Link>
             )

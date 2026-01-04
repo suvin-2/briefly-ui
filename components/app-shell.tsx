@@ -15,7 +15,7 @@ export function AppShell({ children }: AppShellProps) {
       <DesktopSidebar />
 
       {/* Main Content Area */}
-      <main className="md:pl-64">
+      <main id="main-content" className="md:pl-64" role="main" aria-label="주요 콘텐츠">
         <div className="mx-auto max-w-6xl px-4 py-6 pb-24 md:px-8 md:pb-6">{children}</div>
       </main>
 

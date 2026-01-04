@@ -18,7 +18,7 @@ export function DesktopSidebar() {
   ]
 
   return (
-    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 md:block">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 md:block" role="complementary" aria-label="사이드바">
       <div className="h-full border-r border-gray-200/50 bg-slate-50">
         <div className="flex h-full flex-col">
           {/* Logo/Brand */}
@@ -27,7 +27,7 @@ export function DesktopSidebar() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 p-4">
+          <nav className="flex-1 space-y-1 p-4" role="navigation" aria-label="메인 네비게이션">
             {navigationItems.map((item) => {
               const isActive = pathname === item.href
               return (
@@ -40,8 +40,10 @@ export function DesktopSidebar() {
                       ? "bg-white text-gray-900 shadow-sm"
                       : "text-gray-600 hover:bg-white/50 hover:text-gray-900",
                   )}
+                  aria-label={item.name}
+                  aria-current={isActive ? "page" : undefined}
                 >
-                  <item.icon className="h-5 w-5" />
+                  <item.icon className="h-5 w-5" aria-hidden="true" />
                   {item.name}
                 </Link>
               )
@@ -57,8 +59,10 @@ export function DesktopSidebar() {
                   ? "bg-white text-gray-900 shadow-sm"
                   : "text-gray-500 hover:bg-white/50 hover:text-gray-700",
               )}
+              aria-label={t.uiGuide}
+              aria-current={pathname === "/ui-guide" ? "page" : undefined}
             >
-              <Beaker className="h-5 w-5" />
+              <Beaker className="h-5 w-5" aria-hidden="true" />
               {t.uiGuide}
             </Link>
           </div>

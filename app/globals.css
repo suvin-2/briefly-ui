@@ -125,10 +125,29 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* WCAG AA 접근성 - 향상된 포커스 링 */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-[#5D7AA5] ring-offset-2 ring-offset-background;
+  }
+
+  /* 키보드 네비게이션 시각화 */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply outline-none ring-2 ring-[#5D7AA5] ring-offset-2;
+  }
+
+  /* Skip to main content 링크 (스크린 리더용) */
+  .skip-to-main {
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-[#5D7AA5] focus:px-4 focus:py-2 focus:text-white focus:shadow-lg;
   }
 }
 

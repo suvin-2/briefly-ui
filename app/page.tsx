@@ -6,7 +6,7 @@ import { WeeklyDateStrip } from "@/components/weekly-date-strip"
 import { TodoItem } from "@/components/todo-item"
 import { TodoInput } from "@/components/todo-input"
 import { TodoDetailModal } from "@/components/todo-detail-modal"
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
+import { TodoListSkeleton } from "@/components/todo-skeleton"
 import { useLanguage } from "@/lib/language-context"
 import { useTodos } from "@/hooks/use-todos"
 import type { Todo } from "@/types"
@@ -64,14 +64,14 @@ export default function HomePage() {
 
         {/* Todo List - Responsive Grid */}
         {loading ? (
-          <LoadingSpinner text="할 일을 불러오는 중..." />
+          <TodoListSkeleton />
         ) : todos.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-12 text-gray-500" role="status">
             <p>할 일이 없습니다.</p>
             <p className="text-sm">새로운 할 일을 추가해보세요!</p>
           </div>
         ) : (
-          <div className="grid gap-3 md:grid-cols-2 md:gap-4">
+          <div className="grid gap-3 md:grid-cols-2 md:gap-4" role="list" aria-label="할 일 목록">
             {todos.map((todo) => (
               <TodoItem
                 key={todo.id}
