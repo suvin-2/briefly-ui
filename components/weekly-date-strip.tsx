@@ -109,22 +109,6 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const dateButtonRefs = useRef<Map<number, HTMLButtonElement>>(new Map())
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(true)
-
-  const checkScroll = () => {
-    const container = scrollContainerRef.current
-    if (!container) return
-
-    const { scrollLeft, scrollWidth, clientWidth } = container
-
-    setCanScrollLeft(scrollLeft > 0)
-    setCanScrollRight(scrollLeft + clientWidth < scrollWidth)
-  }
-
-  useEffect(() => {
-    checkScroll()
-  }, [mobileDates])
 
   // Auto-scroll selected date into view
   useEffect(() => {
@@ -166,20 +150,19 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
       </div>
 
       <div className="max-w-full rounded-xl border border-white/50 bg-white/70 backdrop-blur-md">
-        <div className="flex items-center gap-2 p-0">
-          <Button variant="ghost" size="icon" onClick={handlePrev} className="h-8 w-8 shrink-0 text-gray-500">
+        <div className="relative flex items-center gap-2 p-0">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handlePrev}
+            className="relative z-20 h-8 w-8 shrink-0 border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50"
+          >
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
           <div className="relative min-w-0 flex-1 md:hidden">
-            {/* Left fade gradient - only visible when can scroll left */}
-            {canScrollLeft && (
-              <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-6 bg-gradient-to-r from-white/70 via-white/40 to-transparent" />
-            )}
-
             <div
               ref={scrollContainerRef}
-              onScroll={checkScroll}
               className="scrollbar-hide flex snap-x snap-mandatory gap-1 overflow-x-auto p-2"
             >
               {mobileDates.map((item, idx) => {
@@ -214,11 +197,6 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
                 )
               })}
             </div>
-
-            {/* Right fade gradient - only visible when can scroll right */}
-            {canScrollRight && (
-              <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-6 bg-gradient-to-l from-white/70 via-white/40 to-transparent" />
-            )}
           </div>
 
           <div className="hidden flex-1 grid-cols-7 gap-2 md:grid">
@@ -251,7 +229,12 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
             })}
           </div>
 
-          <Button variant="ghost" size="icon" onClick={handleNext} className="h-8 w-8 shrink-0 text-gray-500">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleNext}
+            className="relative z-20 h-8 w-8 shrink-0 border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50"
+          >
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
