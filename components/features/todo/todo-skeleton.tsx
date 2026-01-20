@@ -15,8 +15,8 @@ export function TodoSkeleton() {
 
 export function TodoListSkeleton() {
   return (
-    <div className="grid gap-3 md:grid-cols-2 md:gap-4">
-      {Array.from({ length: 6 }).map((_, i) => (
+    <div className="flex flex-col gap-3">
+      {Array.from({ length: 4 }).map((_, i) => (
         <TodoSkeleton key={i} />
       ))}
     </div>

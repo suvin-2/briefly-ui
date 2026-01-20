@@ -150,7 +150,7 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
       </div>
 
       <div className="max-w-full rounded-xl border border-white/50 bg-white/70 backdrop-blur-md dark:border-zinc-800 dark:bg-black">
-        <div className="relative flex items-center gap-2 p-0">
+        <div className="relative flex items-center p-2">
           <Button
             variant="ghost"
             size="icon"
@@ -182,13 +182,13 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
                     className={cn(
                       "flex h-14 w-14 shrink-0 snap-center flex-col items-center justify-center rounded-lg transition-all",
                       selectedMobileIndex === idx
-                        ? "bg-white text-black dark:bg-white dark:text-black"
+                        ? "bg-gray-900 text-white dark:bg-white dark:text-black"
                         : isWeekend
                           ? isSunday
                             ? "bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-transparent dark:text-rose-400 dark:hover:text-rose-300"
                             : "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-transparent dark:text-blue-400 dark:hover:text-blue-300"
                           : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-transparent dark:text-zinc-400 dark:hover:text-zinc-50",
-                      item.isToday && "ring-2 ring-[#5D7AA5] ring-offset-2 dark:ring-zinc-400",
+                      item.isToday && selectedMobileIndex !== idx && "ring-2 ring-[#5D7AA5] ring-offset-2 dark:ring-zinc-400",
                     )}
                   >
                     <span className="text-[9px] font-medium uppercase">{item.day}</span>
@@ -219,7 +219,7 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate }: WeeklyDateStripP
                           ? "bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-transparent dark:text-rose-400 dark:hover:text-rose-300"
                           : "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-transparent dark:text-blue-400 dark:hover:text-blue-300"
                         : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-transparent dark:text-zinc-400 dark:hover:text-zinc-50",
-                    item.isToday && "ring-2 ring-gray-900 ring-offset-2 dark:ring-zinc-400",
+                    item.isToday && selectedDesktopIndex !== idx && "ring-2 ring-gray-900 ring-offset-2 dark:ring-zinc-400",
                   )}
                 >
                   <span className="text-xs font-medium">{item.day}</span>
