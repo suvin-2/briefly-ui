@@ -66,6 +66,8 @@ export function useTodos() {
       queryClient.setQueryData<Todo[]>(["todos", formatLocalDate(selectedDate)], (old = []) =>
         old.map((todo) => (todo.id.startsWith("temp-") ? newTodo : todo))
       )
+      // 날짜별 통계 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ["todoStats"] })
       toast.success("할 일이 추가되었습니다")
     },
     onError: (error, _text, context) => {
@@ -92,6 +94,10 @@ export function useTodos() {
       )
 
       return { previousTodos }
+    },
+    onSuccess: () => {
+      // 날짜별 통계 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ["todoStats"] })
     },
     onError: (error, _id, context) => {
       if (context?.previousTodos) {
@@ -138,6 +144,8 @@ export function useTodos() {
       return { previousTodos }
     },
     onSuccess: () => {
+      // 날짜별 통계 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ["todoStats"] })
       toast.success("할 일이 수정되었습니다")
     },
     onError: (error, _variables, context) => {
@@ -165,6 +173,8 @@ export function useTodos() {
       return { previousTodos }
     },
     onSuccess: () => {
+      // 날짜별 통계 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ["todoStats"] })
       toast.success("할 일이 삭제되었습니다")
     },
     onError: (error, _id, context) => {

@@ -245,3 +245,47 @@ export async function reorderTodos(todoIds: string[]): Promise<void> {
     throw new Error(error.message)
   }
 }
+
+/**
+ * 날짜별 Todo 통계 (개수, 완료 수)
+ */
+export interface TodoStats {
+  date: string
+  total: number
+  completed: number
+}
+
+/**
+ * 날짜 범위의 Todo 통계 조회
+ */
+export async function getTodoStatsByDateRange(startDate: Date, endDate: Date): Promise<TodoStats[]> {
+  const startString = formatLocalDate(startDate)
+  const endString = formatLocalDate(endDate)
+
+  const { data, error } = await supabase
+    .from("todos")
+    .select("target_date, completed")
+    .gte("target_date", startString)
+    .lte("target_date", endString)
+
+  if (error) {
+    console.error("Error fetching todo stats:", error)
+    throw new Error(error.message)
+  }
+
+  // 날짜별 통계 집계
+  const statsMap = new Map<string, { total: number; completed: number }>()
+
+  for (const row of data) {
+    const date = row.target_date
+    const current = statsMap.get(date) || { total: 0, completed: 0 }
+    current.total += 1
+    if (row.completed) current.completed += 1
+    statsMap.set(date, current)
+  }
+
+  return Array.from(statsMap.entries()).map(([date, stats]) => ({
+    date,
+    ...stats,
+  }))
+}

@@ -101,7 +101,7 @@ export default function HomePage() {
         </div>
 
         {/* Weekly Date Strip */}
-        <WeeklyDateStrip selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+        <WeeklyDateStrip selectedDate={selectedDate} onSelectDate={setSelectedDate} isLoading={loading} />
 
         {/* Desktop: Input at Top (Notion style) */}
         <div className="hidden md:block">
