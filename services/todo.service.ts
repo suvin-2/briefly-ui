@@ -34,12 +34,26 @@ interface DatabaseTodo {
 // ========================================
 // 타입 변환 헬퍼 함수
 // ========================================
+
+/**
+ * DB 날짜 문자열('YYYY-MM-DD')을 로컬 Date 객체로 변환
+ *
+ * 주의: new Date('YYYY-MM-DD')는 UTC 자정으로 파싱되어
+ * 한국(UTC+9)에서는 전날로 표시될 수 있음
+ * 예: new Date('2024-01-15') → 2024-01-14 15:00:00 (KST)
+ *
+ * 해결: 'YYYY-MM-DDT00:00:00' 형식으로 파싱하면 로컬 시간으로 해석됨
+ */
+function parseDateString(dateString: string): Date {
+  return new Date(`${dateString}T00:00:00`)
+}
+
 function fromDatabase(dbTodo: DatabaseTodo): Todo {
   return {
     id: dbTodo.id,
     text: dbTodo.content,
     completed: dbTodo.completed,
-    targetDate: dbTodo.target_date ? new Date(dbTodo.target_date) : undefined,
+    targetDate: dbTodo.target_date ? parseDateString(dbTodo.target_date) : undefined,
     memo: dbTodo.memo || undefined,
   }
 }

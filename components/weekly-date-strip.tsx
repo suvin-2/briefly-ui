@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { ChevronLeft, ChevronRight, Loader2, CalendarDays } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
@@ -23,40 +23,49 @@ interface WeeklyDateStripProps {
 // 날짜 범위 제한: 3개월 전/후
 const MAX_MONTHS_RANGE = 3
 
+/**
+ * 주어진 날짜가 속한 주의 시작일(월요일)을 반환
+ * @param date - 기준 날짜
+ * @returns 해당 주의 월요일 Date 객체 (시간은 00:00:00)
+ */
+function getWeekStart(date: Date): Date {
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  const day = d.getDay()
+  // 일요일(0)이면 -6, 그 외에는 (1 - day)를 더해 월요일로 이동
+  const diff = day === 0 ? -6 : 1 - day
+  d.setDate(d.getDate() + diff)
+  return d
+}
+
+/**
+ * 탐색 가능한 날짜 범위 계산 (오늘 기준 ±3개월)
+ */
+function getDateLimits(): { minDate: Date; maxDate: Date } {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const minDate = new Date(today)
+  minDate.setMonth(minDate.getMonth() - MAX_MONTHS_RANGE)
+
+  const maxDate = new Date(today)
+  maxDate.setMonth(maxDate.getMonth() + MAX_MONTHS_RANGE)
+
+  return { minDate, maxDate }
+}
+
 export function WeeklyDateStrip({ selectedDate, onSelectDate, isLoading = false }: WeeklyDateStripProps) {
-  // selectedDate를 기준으로 주의 시작 날짜 계산
-  const getWeekStart = (date: Date) => {
-    const d = new Date(date)
-    d.setHours(0, 0, 0, 0)
-    const day = d.getDay()
-    const diff = day === 0 ? -6 : 1 - day // 월요일 시작
-    d.setDate(d.getDate() + diff)
-    return d
-  }
-
-  // 날짜 범위 제한 계산
-  const getDateLimits = () => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-
-    const minDate = new Date(today)
-    minDate.setMonth(minDate.getMonth() - MAX_MONTHS_RANGE)
-
-    const maxDate = new Date(today)
-    maxDate.setMonth(maxDate.getMonth() + MAX_MONTHS_RANGE)
-
-    return { minDate, maxDate }
-  }
-
-  const { minDate, maxDate } = getDateLimits()
+  // 날짜 범위 제한 (컴포넌트 생명주기 동안 고정)
+  const { minDate, maxDate } = useMemo(() => getDateLimits(), [])
 
   // 현재 보고 있는 주간 (독립적인 상태)
   const [currentWeekStart, setCurrentWeekStart] = useState(() => getWeekStart(selectedDate))
 
-  // 초기 진입 시에만 selectedDate가 포함된 주로 이동
+  // 초기 마운트 시에만 selectedDate가 포함된 주로 이동
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- 의도적으로 마운트 시에만 실행
   useEffect(() => {
     setCurrentWeekStart(getWeekStart(selectedDate))
-  }, []) // 빈 배열로 초기 마운트 시에만 실행
+  }, [])
 
   // Generate dates for the strip (7 days on mobile, 14 on desktop)
   const generateDates = (count: number): DateItem[] => {
@@ -153,7 +162,12 @@ export function WeeklyDateStrip({ selectedDate, onSelectDate, isLoading = false 
     }
   }, [selectedMobileIndex, selectedDate])
 
-  // 키보드 네비게이션
+  /**
+   * 키보드 좌우 화살표로 날짜 이동
+   * - ArrowLeft: 하루 전으로 이동 (minDate까지)
+   * - ArrowRight: 하루 후로 이동 (maxDate까지)
+   * - 주간 경계를 넘으면 자동으로 주간 뷰도 이동
+   */
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === "ArrowLeft") {
       e.preventDefault()

@@ -36,7 +36,12 @@ export default function HomePage() {
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
 
-  // DnD sensors
+  /**
+   * 드래그 앤 드롭 센서 설정
+   * - PointerSensor: 마우스 드래그 (8px 이동 후 활성화 - 클릭과 구분)
+   * - TouchSensor: 터치 드래그 (200ms 홀드 후 활성화 - 스크롤과 구분)
+   * - KeyboardSensor: 키보드로 정렬 (접근성)
+   */
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -54,6 +59,10 @@ export default function HomePage() {
     })
   )
 
+  /**
+   * 드래그 종료 시 순서 변경 처리
+   * arrayMove로 배열 내 위치를 교환하고 handleReorder로 DB에 저장
+   */
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
 

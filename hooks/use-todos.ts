@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import type { Todo } from "@/types"
@@ -26,11 +26,14 @@ export function useTodos() {
     staleTime: 30 * 1000, // 30초 동안 fresh
   })
 
-  // 에러 처리
-  if (error) {
-    console.error("Failed to load todos:", error)
-    toast.error("할 일을 불러오는데 실패했습니다")
-  }
+  // 에러 처리 - useEffect로 분리하여 렌더링 중 사이드 이펙트 방지
+  // (렌더링 중 toast.error 호출 시 무한 루프 발생 가능)
+  useEffect(() => {
+    if (error) {
+      console.error("Failed to load todos:", error)
+      toast.error("할 일을 불러오는데 실패했습니다")
+    }
+  }, [error])
 
   // Add Todo Mutation
   const addMutation = useMutation({

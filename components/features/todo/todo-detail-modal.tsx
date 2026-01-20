@@ -62,25 +62,29 @@ export function TodoDetailModal({ open, onOpenChange, todo, onSave, onDelete }: 
     }
   }, [todo])
 
+  /**
+   * 두 날짜가 다른지 비교 (날짜만 비교, 시간 무시)
+   * - 둘 다 undefined면 false (같음)
+   * - 하나만 undefined면 true (다름)
+   * - 둘 다 있으면 날짜 문자열로 비교
+   */
+  const areDatesEqual = useCallback((date1: Date | undefined, date2: Date | undefined): boolean => {
+    if (!date1 && !date2) return true
+    if (!date1 || !date2) return false
+    return date1.toDateString() === date2.toDateString()
+  }, [])
+
   // Check if there are unsaved changes
   const isDirty = useCallback(() => {
     if (!todo) return false
     const textChanged = text !== originalText
     const memoChanged = memo !== originalMemo
-    const dateChanged = (() => {
-      if (!originalDate && !targetDate) return false
-      if (!originalDate || !targetDate) return true
-      return originalDate.toDateString() !== targetDate.toDateString()
-    })()
+    const dateChanged = !areDatesEqual(originalDate, targetDate)
     return textChanged || memoChanged || dateChanged
-  }, [text, memo, targetDate, originalText, originalMemo, originalDate, todo])
+  }, [text, memo, targetDate, originalText, originalMemo, originalDate, todo, areDatesEqual])
 
   // Check if date changed (for warning display)
-  const isDateChanged = (() => {
-    if (!originalDate && !targetDate) return false
-    if (!originalDate || !targetDate) return true
-    return originalDate.toDateString() !== targetDate.toDateString()
-  })()
+  const isDateChanged = !areDatesEqual(originalDate, targetDate)
 
   const handleSave = async () => {
     if (!todo) return
@@ -216,7 +220,7 @@ export function TodoDetailModal({ open, onOpenChange, todo, onSave, onDelete }: 
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto border-white/50 bg-white/90 p-0 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/90">
-                  <Calendar mode="single" selected={targetDate} onSelect={setTargetDate} initialFocus />
+                  <Calendar mode="single" selected={targetDate} onSelect={setTargetDate} />
                 </PopoverContent>
               </Popover>
               {isDateChanged && (
