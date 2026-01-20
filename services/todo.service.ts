@@ -27,6 +27,7 @@ interface DatabaseTodo {
   completed: boolean
   target_date: string // DB에서는 date string
   memo: string | null
+  position: number | null
   created_at: string
 }
 
@@ -78,7 +79,7 @@ export async function getAllTodos(): Promise<Todo[]> {
 }
 
 /**
- * 특정 날짜의 Todo 조회
+ * 특정 날짜의 Todo 조회 (position 순으로 정렬)
  */
 export async function getTodosByDate(date: Date): Promise<Todo[]> {
   const dateString = formatLocalDate(date)
@@ -87,6 +88,7 @@ export async function getTodosByDate(date: Date): Promise<Todo[]> {
     .from("todos")
     .select("*")
     .eq("target_date", dateString)
+    .order("position", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: false })
 
   if (error) {
@@ -133,11 +135,24 @@ export async function createTodo(todo: Omit<Todo, "id">): Promise<Todo> {
 
   const dbTodo = toDatabase(todo)
 
+  // 새 Todo는 position 0으로 생성 (맨 위에 표시)
+  // 기존 todos의 position을 1씩 증가시킴
+  const { error: reorderError } = await supabase.rpc('increment_todo_positions', {
+    p_user_id: user.id,
+    p_target_date: dbTodo.target_date,
+  })
+
+  // RPC 함수가 없는 경우 무시 (마이그레이션 전)
+  if (reorderError && !reorderError.message.includes('function')) {
+    console.error("Error incrementing positions:", reorderError)
+  }
+
   const { data, error } = await supabase
     .from("todos")
     .insert({
       ...dbTodo,
       user_id: user.id,
+      position: 0,
     })
     .select()
     .single()
@@ -202,6 +217,31 @@ export async function deleteTodo(id: string): Promise<void> {
 
   if (error) {
     console.error("Error deleting todo:", error)
+    throw new Error(error.message)
+  }
+}
+
+/**
+ * Todo 순서 변경 (드래그 앤 드롭)
+ * @param todoIds - 새로운 순서로 정렬된 todo id 배열
+ */
+export async function reorderTodos(todoIds: string[]): Promise<void> {
+  // 각 todo의 position을 배열 인덱스로 업데이트
+  const updates = todoIds.map((id, index) => ({
+    id,
+    position: index,
+  }))
+
+  // Batch update using Promise.all
+  const results = await Promise.all(
+    updates.map(({ id, position }) =>
+      supabase.from("todos").update({ position }).eq("id", id)
+    )
+  )
+
+  const error = results.find((r) => r.error)?.error
+  if (error) {
+    console.error("Error reordering todos:", error)
     throw new Error(error.message)
   }
 }
