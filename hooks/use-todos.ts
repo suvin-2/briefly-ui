@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import type { Todo } from "@/types"
@@ -102,7 +102,7 @@ export function useTodos() {
     },
   })
 
-  const handleAdd = (text: string) => addMutation.mutate(text)
+  const handleAdd = (text: string) => addMutation.mutateAsync(text)
   const handleToggle = (id: string) => toggleMutation.mutate(id)
 
   // Update Todo Mutation
@@ -181,6 +181,35 @@ export function useTodos() {
 
   const handleDelete = (id: string) => deleteMutation.mutateAsync(id)
 
+  // Reorder Mutation
+  const reorderTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const reorderMutation = useMutation({
+    mutationFn: (todoIds: string[]) => todoService.reorderTodos(todoIds),
+    onError: (error) => {
+      console.error("Failed to reorder todos:", error)
+      toast.error("순서 변경에 실패했습니다")
+      // Refetch to restore correct order from DB
+      queryClient.invalidateQueries({ queryKey: ["todos", formatLocalDate(selectedDate)] })
+    },
+  })
+
+  // Reorder todos with optimistic update and debounced DB save
+  const handleReorder = (newTodos: Todo[]) => {
+    // Optimistic update immediately
+    queryClient.setQueryData<Todo[]>(["todos", formatLocalDate(selectedDate)], newTodos)
+
+    // Debounce DB save (300ms) to handle rapid reordering
+    if (reorderTimeoutRef.current) {
+      clearTimeout(reorderTimeoutRef.current)
+    }
+
+    reorderTimeoutRef.current = setTimeout(() => {
+      const todoIds = newTodos.map((t) => t.id)
+      reorderMutation.mutate(todoIds)
+    }, 300)
+  }
+
   return {
     todos,
     loading,
@@ -190,5 +219,8 @@ export function useTodos() {
     handleToggle,
     handleUpdate,
     handleDelete,
+    handleReorder,
+    isAdding: addMutation.isPending,
+    addError: addMutation.error ? "할 일 추가에 실패했습니다" : null,
   }
 }
