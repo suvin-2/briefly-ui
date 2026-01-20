@@ -131,8 +131,11 @@
   * {
     @apply border-border;
   }
+  html {
+    @apply h-full overflow-x-hidden;
+  }
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
+    @apply min-h-full bg-background text-foreground transition-colors duration-300;
   }
 
   /* WCAG AA 접근성 - 향상된 포커스 링 */
