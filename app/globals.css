@@ -132,10 +132,17 @@
     @apply border-border;
   }
   html {
-    @apply h-full overflow-x-hidden;
+    @apply h-full overflow-x-hidden overflow-y-scroll;
   }
   body {
     @apply min-h-full bg-background text-foreground transition-colors duration-300;
+  }
+
+  /* Radix UI Dialog/AlertDialog가 열릴 때 레이아웃 시프트 방지 */
+  /* Radix의 RemoveScroll이 body에 padding-right를 추가하는 것을 무시 */
+  body[data-scroll-locked] {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
   }
 
   /* WCAG AA 접근성 - 향상된 포커스 링 */
