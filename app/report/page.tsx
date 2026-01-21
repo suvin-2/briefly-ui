@@ -132,7 +132,7 @@ export default function ReportPage() {
         {isMobile && (
           <button
             onClick={() => setDialogOpen(true)}
-            className="fixed bottom-20 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-[#5D7AA5] text-white shadow-lg transition-colors hover:bg-[#4A6285]"
+            className="fixed bottom-24 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-[#5D7AA5] text-white shadow-lg transition-colors hover:bg-[#4A6285]"
             aria-label="새 리포트 생성"
           >
             <Plus className="h-6 w-6" />
