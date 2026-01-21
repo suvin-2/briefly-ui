@@ -91,6 +91,14 @@ export const translations = {
     selectDateRangePlaceholder: "날짜 범위 선택",
     reportTitlePlaceholder: "예: 12월 4주차 주간보고",
     reportTitleLabel: "리포트 제목",
+    dateRangeLabel: "날짜 범위",
+    selectTemplateLabel: "템플릿 선택",
+    sampleData: "샘플 데이터",
+    rawMarkdown: "원본 Markdown 보기",
+    renderedPreview: "렌더링된 미리보기",
+    reportDialogDescription: "완료된 할 일들을 바탕으로 리포트를 생성합니다",
+    editReportDialogDescription: "리포트 제목과 내용을 수정할 수 있습니다",
+    reportGenerationFailed: "리포트 생성에 실패했습니다",
 
     // Templates
     templatesLibrary: "템플릿 라이브러리",
@@ -241,6 +249,14 @@ export const translations = {
     selectDateRangePlaceholder: "Select date range",
     reportTitlePlaceholder: "e.g., Week 4 December Report",
     reportTitleLabel: "Report Title",
+    dateRangeLabel: "Date Range",
+    selectTemplateLabel: "Select Template",
+    sampleData: "Sample Data",
+    rawMarkdown: "View Raw Markdown",
+    renderedPreview: "Rendered Preview",
+    reportDialogDescription: "Generate a report based on completed todos",
+    editReportDialogDescription: "Edit the report title and content",
+    reportGenerationFailed: "Failed to generate report",
 
     // Templates
     templatesLibrary: "Templates Library",
