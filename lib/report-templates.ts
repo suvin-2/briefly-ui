@@ -150,11 +150,6 @@ export function generateBasicTemplate(todos: Todo[], startDate: Date, endDate: D
     markdown += `---\n\n`
   }
 
-  markdown += `## 📅 Next Week Plan\n\n`
-  markdown += `- [ ] 다음 주 업무 계획을 작성하세요\n`
-  markdown += `- [ ] 우선순위를 정리하세요\n`
-  markdown += `- [ ] 필요한 리소스를 확인하세요\n\n`
-
   return markdown
 }
 
@@ -234,12 +229,6 @@ export function generateDetailedTemplate(todos: Todo[], startDate: Date, endDate
 
   markdown += `## 📝 종합 의견\n\n`
   markdown += `_이번 주 업무에 대한 종합 의견을 작성하세요._\n\n`
-  markdown += `---\n\n`
-
-  markdown += `## 📅 다음 주 계획\n\n`
-  markdown += `1. \n`
-  markdown += `2. \n`
-  markdown += `3. \n\n`
 
   return markdown
 }
@@ -279,13 +268,6 @@ export function generateSummaryTemplate(todos: Todo[], startDate: Date, endDate:
     }
     markdown += `\n`
   }
-
-  markdown += `---\n\n`
-
-  markdown += `## 🎯 다음 주 목표\n\n`
-  markdown += `- \n`
-  markdown += `- \n`
-  markdown += `- \n\n`
 
   return markdown
 }
@@ -352,11 +334,6 @@ export function generateDevTeamTemplate(todos: Todo[], startDate: Date, endDate:
       markdown += `---\n\n`
     })
   }
-
-  markdown += `## 🎯 Next Sprint Goals\n\n`
-  markdown += `- [ ] \n`
-  markdown += `- [ ] \n`
-  markdown += `- [ ] \n\n`
 
   markdown += `## 📝 Technical Notes\n\n`
   markdown += `_Add any technical decisions, architecture changes, or important notes here._\n\n`
@@ -448,18 +425,7 @@ export function generateSalesTeamTemplate(todos: Todo[], startDate: Date, endDat
   }
 
   markdown += `## 💡 주요 이슈 및 특이사항\n\n`
-  markdown += `- \n`
-  markdown += `- \n`
-  markdown += `- \n\n`
-
-  markdown += `---\n\n`
-
-  markdown += `## 🎯 다음 주 목표\n\n`
-  markdown += `| 활동 | 목표 |\n`
-  markdown += `|------|------|\n`
-  markdown += `|  |  |\n`
-  markdown += `|  |  |\n`
-  markdown += `|  |  |\n\n`
+  markdown += `_이슈나 특이사항이 있으면 작성하세요._\n\n`
 
   return markdown
 }

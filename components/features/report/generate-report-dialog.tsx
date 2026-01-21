@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer"
 import {
@@ -20,7 +20,9 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { CalendarIcon, Sparkles, ChevronDown, Eye, AlertTriangle } from "lucide-react"
+import { CalendarIcon, Sparkles, ChevronDown, Eye, AlertTriangle, Code } from "lucide-react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { format, differenceInDays } from "date-fns"
 import { cn, generateReportTitle } from "@/lib/utils"
 import { useMobile } from "@/hooks/use-mobile"
@@ -49,6 +51,7 @@ export function GenerateReportDialog({ open, onOpenChange, onReportCreated }: Ge
   const [template, setTemplate] = useState<TemplateType>("basic")
   const [generating, setGenerating] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewMode, setPreviewMode] = useState<"rendered" | "raw">("rendered")
   const [showNoTodosAlert, setShowNoTodosAlert] = useState(false)
   const [pendingTodos, setPendingTodos] = useState<Todo[]>([])
   const userModifiedTitle = useRef(false) // 사용자가 제목을 직접 수정했는지 추적
@@ -57,8 +60,8 @@ export function GenerateReportDialog({ open, onOpenChange, onReportCreated }: Ge
   const today = new Date()
   today.setHours(23, 59, 59, 999)
 
-  // 미리보기용 샘플 데이터 생성
-  const getSamplePreview = () => {
+  // 미리보기용 샘플 데이터 생성 (useMemo로 최적화)
+  const samplePreview = useMemo(() => {
     const sampleTodos = [
       {
         id: "1",
@@ -93,7 +96,7 @@ export function GenerateReportDialog({ open, onOpenChange, onReportCreated }: Ge
     const sampleEndDate = new Date()
 
     return generateReportByTemplate(template, sampleTodos, sampleStartDate, sampleEndDate)
-  }
+  }, [template])
 
   // 날짜 범위가 변경되면 자동으로 제목 생성 (사용자가 수정하지 않은 경우에만)
   useEffect(() => {
@@ -210,7 +213,7 @@ export function GenerateReportDialog({ open, onOpenChange, onReportCreated }: Ge
       await createReport(finalTitle, allTodos)
     } catch (error) {
       console.error("Failed to generate report:", error)
-      toast.error("리포트 생성에 실패했습니다")
+      toast.error(t.reportGenerationFailed)
       setGenerating(false)
     }
   }
@@ -235,7 +238,7 @@ export function GenerateReportDialog({ open, onOpenChange, onReportCreated }: Ge
       userModifiedTitle.current = false
     } catch (error) {
       console.error("Failed to generate report:", error)
-      toast.error("리포트 생성에 실패했습니다")
+      toast.error(t.reportGenerationFailed)
     } finally {
       setGenerating(false)
     }
@@ -278,8 +281,8 @@ export function GenerateReportDialog({ open, onOpenChange, onReportCreated }: Ge
   }
 
   const content = (
-    <div className="max-h-[60vh] overflow-y-auto pr-2">
-      <div className="space-y-6 p-4">
+    <div className="max-h-[60vh] overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
+      <div className="space-y-6 px-4 py-2">
       <div className="space-y-2">
         <Label htmlFor="title">{t.reportTitleLabel}</Label>
         <Input
@@ -293,7 +296,7 @@ export function GenerateReportDialog({ open, onOpenChange, onReportCreated }: Ge
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="date-range">날짜 범위</Label>
+        <Label htmlFor="date-range">{t.dateRangeLabel}</Label>
         <div className="flex gap-2">
           <Button
             type="button"
@@ -355,7 +358,7 @@ export function GenerateReportDialog({ open, onOpenChange, onReportCreated }: Ge
       </div>
 
       <div className="space-y-3">
-        <Label className="text-sm font-medium text-gray-700">템플릿 선택</Label>
+        <Label className="text-sm font-medium text-gray-700">{t.selectTemplateLabel}</Label>
 
         <RadioGroup value={template} onValueChange={(value) => setTemplate(value as TemplateType)} className="gap-3">
           {/* 일반 템플릿 */}
@@ -454,12 +457,29 @@ export function GenerateReportDialog({ open, onOpenChange, onReportCreated }: Ge
                 <p className="text-xs font-semibold text-gray-500 uppercase">
                   {language === "ko" ? TEMPLATE_CATALOG[template].name : TEMPLATE_CATALOG[template].nameEn}
                 </p>
-                <span className="text-xs text-gray-500">샘플 데이터</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">{t.sampleData}</span>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewMode(previewMode === "rendered" ? "raw" : "rendered")}
+                    className="flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
+                    title={previewMode === "rendered" ? t.rawMarkdown : t.renderedPreview}
+                  >
+                    <Code className="h-3 w-3" />
+                    {previewMode === "rendered" ? "MD" : t.preview}
+                  </button>
+                </div>
               </div>
-              <div className="max-h-64 overflow-y-auto rounded-lg bg-white p-4">
-                <pre className="whitespace-pre-wrap text-xs text-gray-700 font-mono">
-                  {getSamplePreview()}
-                </pre>
+              <div className="max-h-64 overflow-y-auto rounded-lg bg-white p-4 scroll-smooth">
+                {previewMode === "rendered" ? (
+                  <div className="prose prose-sm prose-gray max-w-none text-gray-700 prose-table:border-collapse prose-th:border prose-th:border-gray-300 prose-th:bg-gray-100 prose-th:px-3 prose-th:py-2 prose-th:text-left prose-th:font-semibold prose-th:text-sm prose-td:border prose-td:border-gray-300 prose-td:px-3 prose-td:py-2 prose-td:text-sm">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{samplePreview}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <pre className="whitespace-pre-wrap text-xs text-gray-700 font-mono">
+                    {samplePreview}
+                  </pre>
+                )}
               </div>
             </div>
           </CollapsibleContent>
@@ -500,7 +520,7 @@ export function GenerateReportDialog({ open, onOpenChange, onReportCreated }: Ge
           <DrawerContent className="max-h-[90vh]">
             <DrawerHeader>
               <DrawerTitle>{t.createNewReport}</DrawerTitle>
-              <DrawerDescription>완료된 할 일들을 바탕으로 리포트를 생성합니다</DrawerDescription>
+              <DrawerDescription>{t.reportDialogDescription}</DrawerDescription>
             </DrawerHeader>
             {content}
             <DrawerFooter>{footer}</DrawerFooter>
@@ -534,10 +554,10 @@ export function GenerateReportDialog({ open, onOpenChange, onReportCreated }: Ge
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="border-white/50 bg-white/80 backdrop-blur-md sm:max-w-125 max-h-[90vh] flex flex-col">
+        <DialogContent className="sm:max-w-125 max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{t.createNewReport}</DialogTitle>
-            <DialogDescription>완료된 할 일들을 바탕으로 리포트를 생성합니다</DialogDescription>
+            <DialogDescription>{t.reportDialogDescription}</DialogDescription>
           </DialogHeader>
           {content}
           <DialogFooter>{footer}</DialogFooter>
