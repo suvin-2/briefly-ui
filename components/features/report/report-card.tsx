@@ -19,11 +19,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { FileText, Download, Share2, X, FileDown, Edit } from "lucide-react"
+import { FileText, Download, Share2, X, FileDown, Edit, Loader2 } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { downloadAsMarkdown } from "@/lib/download-utils"
 import { formatLocalDate } from "@/services/todo.service"
-import { downloadReportAsPdf } from "@/services/report.service"
+import { downloadReportPdf } from "@/lib/pdf-generator"
 import type { Report } from "@/types"
 import { toast } from "sonner"
 
@@ -44,10 +44,13 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
   }
 
   const handleDownloadPdf = async () => {
+    // 생성 시작 토스트 (로딩 상태)
+    const toastId = toast.loading(t.pdfGenerating)
+
     try {
       setIsGeneratingPdf(true)
-      await downloadReportAsPdf(report, t.pdfGenerating)
-      toast.success(t.pdfDownloadSuccess)
+      await downloadReportPdf(report)
+      toast.success(t.pdfDownloadSuccess, { id: toastId })
     } catch (error) {
       console.error("PDF generation failed:", error)
 
@@ -62,6 +65,7 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
       }
 
       toast.error(errorMessage, {
+        id: toastId,
         description: t.pdfFallbackMessage,
         action: {
           label: t.retry,
@@ -115,7 +119,7 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
   return (
     <>
       <Card
-        className="group flex h-full flex-col border-gray-200 bg-white shadow-lg transition-all hover:shadow-xl hover:shadow-gray-200/60 dark:border-zinc-800 dark:bg-black dark:shadow-none dark:hover:shadow-none"
+        className="group flex h-full min-h-70 flex-col border-gray-200 bg-white shadow-lg transition-shadow hover:shadow-xl hover:shadow-gray-200/60 dark:border-zinc-800 dark:bg-black dark:shadow-none dark:hover:shadow-none"
         role="article"
         aria-labelledby={`report-title-${report.id}`}
       >
@@ -163,16 +167,16 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
             <span className="font-medium text-gray-700 dark:text-zinc-400">{createdAt}</span>
           </div>
         </div>
-        <div className="flex gap-3 pt-2">
+        <div className="grid grid-cols-3 gap-2 pt-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => onEdit(report.id)}
-            className="flex-1 rounded-xl border-gray-200 bg-white font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white dark:border-zinc-800 dark:bg-transparent dark:text-zinc-400 dark:shadow-none dark:hover:border-[#5D7AA5] dark:hover:bg-[#5D7AA5] dark:hover:text-white"
+            className="w-full rounded-xl border-gray-200 bg-white px-2 font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white dark:border-zinc-800 dark:bg-transparent dark:text-zinc-400 dark:shadow-none dark:hover:border-[#5D7AA5] dark:hover:bg-[#5D7AA5] dark:hover:text-white"
             aria-label={`${report.title} 리포트 수정`}
           >
-            <Edit className="mr-2 h-4 w-4" aria-hidden="true" />
-            {t.edit}
+            <Edit className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span className="ml-1 truncate">{t.edit}</span>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -180,10 +184,14 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
                 variant="outline"
                 size="sm"
                 disabled={isGeneratingPdf}
-                className="flex-1 rounded-xl border-gray-200 bg-white font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white dark:border-zinc-800 dark:bg-transparent dark:text-zinc-400 dark:shadow-none dark:hover:border-[#5D7AA5] dark:hover:bg-[#5D7AA5] dark:hover:text-white"
+                className="w-full rounded-xl border-gray-200 bg-white px-2 font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white dark:border-zinc-800 dark:bg-transparent dark:text-zinc-400 dark:shadow-none dark:hover:border-[#5D7AA5] dark:hover:bg-[#5D7AA5] dark:hover:text-white"
               >
-                <Download className="mr-2 h-4 w-4" />
-                {isGeneratingPdf ? t.generating : t.download}
+                {isGeneratingPdf ? (
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4 shrink-0" />
+                )}
+                <span className="ml-1 truncate">{isGeneratingPdf ? t.generating : t.download}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
@@ -201,11 +209,11 @@ export function ReportCard({ report, onDelete, onEdit }: ReportCardProps) {
             variant="outline"
             size="sm"
             onClick={handleShare}
-            className="flex-1 rounded-xl border-gray-200 bg-white font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white dark:border-zinc-800 dark:bg-transparent dark:text-zinc-400 dark:shadow-none dark:hover:border-[#5D7AA5] dark:hover:bg-[#5D7AA5] dark:hover:text-white"
+            className="w-full rounded-xl border-gray-200 bg-white px-2 font-medium text-gray-700 shadow-sm transition-all hover:border-[#5D7AA5] hover:bg-[#5D7AA5] hover:text-white dark:border-zinc-800 dark:bg-transparent dark:text-zinc-400 dark:shadow-none dark:hover:border-[#5D7AA5] dark:hover:bg-[#5D7AA5] dark:hover:text-white"
             aria-label={`${report.title} 리포트 공유`}
           >
-            <Share2 className="mr-2 h-4 w-4" aria-hidden="true" />
-            {t.share}
+            <Share2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span className="ml-1 truncate">{t.share}</span>
           </Button>
         </div>
       </CardContent>

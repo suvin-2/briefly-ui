@@ -10,7 +10,7 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50/30 via-purple-50/20 to-blue-50/30 dark:from-transparent dark:via-transparent dark:to-transparent">
+    <div className="min-h-screen w-full bg-gradient-to-br from-pink-50/30 via-purple-50/20 to-blue-50/30 dark:from-transparent dark:via-transparent dark:to-transparent">
       {/* Desktop Sidebar - Hidden on mobile */}
       <DesktopSidebar />
 
